@@ -2,9 +2,9 @@
 
 namespace PhpMx;
 
-use Error;
+use Exception;
 
-abstract class Middleware
+class Middleware
 {
     protected static array $QUEUE = [];
 
@@ -48,12 +48,12 @@ abstract class Middleware
             $actionFile = Path::seekFile($actionFile);
 
             if (!$actionFile)
-                throw new Error("Middleware [$middleware] not found");
+                throw new Exception("Middleware [$middleware] not found");
 
             $action = Import::return($actionFile);
 
             if (!is_callable($action))
-                throw new Error("Middleware [$middleware] cannot be called");
+                throw new Exception("Middleware [$middleware] cannot be called");
 
             return fn($next) => $action($next);
         }
@@ -64,6 +64,6 @@ abstract class Middleware
         if (is_null($middleware))
             return fn($next) => $next();
 
-        throw new Error('Impossible middleware resolve');
+        throw new Exception('Impossible middleware resolve');
     }
 }
