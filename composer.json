@@ -1,3 +1,18 @@
 {
-  "minimum-stability": "dev"
+    "minimum-stability": "dev",
+    "require": {
+        "phpmx/core": "dev-main"
+    },
+    "autoload": {
+        "psr-4": {
+            "": "source/"
+        },
+        "files": [
+            "helper/constant/http_status.php",
+            "helper/constant/request_is.php",
+            "helper/function/is.php",
+            "helper/script/env.php",
+            "helper/script/path.php"
+        ]
+    }
 }

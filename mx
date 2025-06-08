@@ -1,0 +1,18 @@
+<?php
+
+chdir(__DIR__);
+
+require "./vendor/autoload.php";
+
+date_default_timezone_set('America/Sao_Paulo');
+
+echo "---< MX-CMD >---\n\n";
+
+$terminalArgs = $argv;
+
+array_shift($terminalArgs);
+\PhpMx\Terminal::run(...$terminalArgs);
+
+echo "\n---< MX-CMD >---\n";
+
+die;
