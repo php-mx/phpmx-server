@@ -1,5 +1,6 @@
 <?php
 
+use PhpMx\Log;
 use PhpMx\Response;
 
 return new class {
@@ -34,6 +35,9 @@ return new class {
             'data' => $response
         ];
 
+        if (env('DEV'))
+            $response['log'] = Log::getArray();
+
         Response::status($status);
         Response::content($response);
     }
@@ -67,6 +71,9 @@ return new class {
                 ],
                 'data' => null
             ];
+
+            if (env('DEV'))
+                $response['log'] = Log::getArray();
 
             Response::header('Mx-Error-Message', $response['info']['message']);
             Response::header('Mx-Error-Status', $response['info']['status']);
