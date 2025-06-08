@@ -15,7 +15,7 @@ $interceptor = new class extends Terminal {
 
     protected static array $ROUTE = [];
 
-    function __invoke($method = null)
+    function __invoke($method)
     {
         self::$METHOD = $method;
 
@@ -26,74 +26,38 @@ $interceptor = new class extends Terminal {
     {
         self::$MIDDLEWARES[] = $globalMiddlewares;
 
-        foreach (Path::seekDirs('routes') as $path) {
-            $origin = $this->getOrigim($path);
-            self::echo('[#]', $origin);
-            self::echoLine();
+        $paths = Path::seekDirs('routes');
+        $paths = array_reverse($paths);
 
-            foreach (Dir::seekForFile($path, true) as $routeFile) {
-                $file = path($path, $routeFile);
-                self::echo(' - [#]', $file);
+        foreach ($paths as $path)
+            foreach (Dir::seekForFile($path, true) as $file)
+                Import::only("$path/$file", true);
 
-                self::$ROUTE = [];
-                Import::only($file, true);
+        $routes = $this->organize(self::$ROUTE);
 
-                self::$ROUTE = array_reverse(self::$ROUTE);
-
-                foreach (self::$ROUTE as &$route) {
-                    $method = $route['method'];
-                    $template = $route['template'];
-
-                    $replaced = '';
-                    if (self::$USED[$method][$template] ?? false) {
-                        $replaced = self::$USED[$method][$template];
-
-                        if ($replaced['origin'] == $origin) {
-                            $replaced = prepare(' [replaced in [#file] ([#line])]', $replaced);
-                        } else {
-                            $replaced = prepare(' [replaced in [#origin]: [#file] ([#line])]', $replaced);
-                        }
-                    }
-
-                    self::$USED[$method][$template] = self::$USED[$method][$template] ?? [
-                        'origin' => $origin,
-                        'file' => $file,
-                        'line' => $route['line'],
-                    ];
-
-                    $route['status'] = $replaced;
-                }
-
-                self::$ROUTE = array_reverse(self::$ROUTE);
-
-                foreach (self::$ROUTE as $route)
-                    self::echo('    - [[#method]]: [#call] {[#middlewares]}[#status]', $route);
-                self::echo();
-            }
-        }
+        foreach (array_values($routes) as $pos => $route)
+            self::echo('[#pos]: [#call] [[#file] ([#line])]', ['pos' => 1 + $pos, ...$route]);
     }
 
     function route(string $method, string $route, string $response, array $middlewares = [])
     {
         if (is_null(self::$METHOD) || self::$METHOD == $method) {
+
             $route = implode('/', [...self::$PATH, $route]);
             list($template, $params) = $this->parseRouteTemplate($route);
 
-            $middlewares = [...end(self::$MIDDLEWARES), ...$middlewares];
-            $middlewares = implode(',', $middlewares);
-
-            $line = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]['line'];
+            $dbug = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1];
+            $line = $dbug['line'];
+            $file = path($dbug['file']);
 
             $params = array_map(fn($v) => is_null($v) ? $v : "[#$v]", $params);
             $call = str_replace('#', '[#]', $template);
             $call = prepare($call, $params);
 
-            self::$ROUTE[] = [
-                'method' => strtoupper($method),
-                'template' => $template,
+            self::$ROUTE[$template] = [
                 'call' => $call,
                 'line' => $line,
-                'middlewares' => $middlewares,
+                'file' => $file,
             ];
         }
     }
@@ -117,18 +81,6 @@ $interceptor = new class extends Terminal {
         $wrapper = fn() => $this->middleware($middlewares, $wrapper);
         $wrapper = fn() => $this->path($path, $wrapper);
         $wrapper();
-    }
-
-    protected function getOrigim($path)
-    {
-        if ($path === 'routes') return 'CURRENT-PROJECT';
-
-        if (str_starts_with($path, 'vendor/')) {
-            $parts = explode('/', $path);
-            return $parts[1] . '-' . $parts[2];
-        }
-
-        return 'unknown';
     }
 
     protected function parseRouteTemplate(string $route): array
@@ -166,6 +118,41 @@ $interceptor = new class extends Terminal {
         }
 
         return $route;
+    }
+
+    protected function organize(array $array): array
+    {
+        uksort($array, function ($a, $b) {
+            $nBarrA = substr_count($a, '/');
+            $nBarrB = substr_count($b, '/');
+
+            if ($nBarrA != $nBarrB) return $nBarrB <=> $nBarrA;
+
+            $arrayA = explode('/', $a);
+            $arrayB = explode('/', $b);
+            $na = '';
+            $nb = '';
+            $max = max(count($arrayA), count($arrayB));
+
+            $dynamicParamWeight  =  ['#' => '1',  '...' => '2'];
+            for ($i = 0; $i < $max; $i++) {
+                $aVal = $arrayA[$i] ?? '';
+                $bVal = $arrayB[$i] ?? '';
+                $na .= $dynamicParamWeight[$aVal] ?? '0';
+                $nb .= $dynamicParamWeight[$bVal] ?? '0';
+            }
+
+            $result = intval($na) <=> intval($nb);
+            if ($result) return $result;
+
+            $result = count($arrayA) <=> count($arrayB);
+            if ($result) return $result * -1;
+
+            $result = strlen($a) <=> strlen($b);
+            if ($result) return $result * -1;
+        });
+
+        return $array;
     }
 };
 
