@@ -68,29 +68,36 @@ abstract class Router
     /** Resolve a requisição atual enviando a reposta ao cliente */
     static function solve(array $globalMiddlewares = [])
     {
-        $paths = Path::seekDirs('routes');
-        $paths = array_reverse($paths);
+        list($middlewares, $wrapper) = log_add('mx', 'router solve', [], function () use ($globalMiddlewares) {
+            $paths = Path::seekDirs('routes');
+            $paths = array_reverse($paths);
 
-        foreach ($paths as $path)
-            foreach (Dir::seekForFile($path, true) as $file)
-                Import::only("$path/$file", true);
+            foreach ($paths as $path)
+                foreach (Dir::seekForFile($path, true) as $file)
+                    Import::only("$path/$file", true);
 
-        $routeMatch = self::getRouteMatch();
+            $routeMatch = self::getRouteMatch();
 
-        if ($routeMatch) {
-            list($template, $response, $params, $middlewares) = $routeMatch;
-            self::setRequestRouteParams($template, $params);
-            $wrapper = fn() => self::executeActionResponse($response, Request::data());
-            $middlewares = [...$globalMiddlewares, ...$middlewares];
-        } else {
-            $wrapper = fn() => throw new Exception('Route not found', STS_NOT_FOUND);
-            $middlewares = $globalMiddlewares;
-        }
+            if ($routeMatch) {
+                list($template, $response, $params, $middlewares) = $routeMatch;
+                self::setRequestRouteParams($template, $params);
+                $wrapper = fn() => self::executeActionResponse($response, Request::data());
+                $middlewares = [...$globalMiddlewares, ...$middlewares];
+            } else {
+                $wrapper = fn() => throw new Exception('Route not found', STS_NOT_FOUND);
+                $middlewares = $globalMiddlewares;
+            }
+            return [$middlewares, $wrapper];
+        });
 
-        $response = Middleware::run($middlewares, $wrapper);
+        log_add('mx', 'route dispatch', [], function () use ($middlewares, $wrapper) {
+            $wrapper = fn() => log_add('mx', 'route action', [], $wrapper);
 
-        Response::content($response);
-        Response::send();
+            $response = Middleware::run($middlewares, $wrapper);
+
+            Response::content($response);
+            Response::send();
+        });
     }
 
     /** Adiciona uma rota para interpretação */
@@ -108,6 +115,7 @@ abstract class Router
             $params,
             $middlewares
         ];
+        log_add('route', $template);
     }
 
     /** Explode uma rota em [template,params] */
@@ -149,14 +157,16 @@ abstract class Router
         return $route;
     }
 
-    /** Retorna a rota que corresponde a URL atual */
+    /** Retorna o template da rota que corresponde a URL atual */
     protected static function getRouteMatch(): ?array
     {
         $routes = self::organize(self::$ROUTE);
         foreach ($routes as $template => $route)
-            if (self::checkRouteMatch($template))
+            if (self::checkRouteMatch($template)) {
+                log_add('mx', 'route matching [[#]]', [$template]);
                 return $route;
-
+            }
+        log_add('mx', 'route matching not found');
         return null;
     }
     /** Verifica se um template combina com a URL atual */
@@ -245,6 +255,7 @@ abstract class Router
 
         if (is_int($response))
             throw new Exception('response route error', STS_INTERNAL_SERVER_ERROR);
+
 
         list($class, $method) = explode(':', "$response:default");
 
