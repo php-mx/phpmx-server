@@ -7,6 +7,7 @@ use Closure;
 $interceptor = new class extends Terminal {
 
     protected static ?string $METHOD = null;
+    protected static ?string $URI = null;
 
     protected static array $MIDDLEWARES = [];
     protected static array $PATH = [];
@@ -15,9 +16,11 @@ $interceptor = new class extends Terminal {
 
     protected static array $ROUTE = [];
 
-    function __invoke($method = null)
+    function __invoke($method = '*', $uri = null)
     {
-        self::$METHOD = $method;
+        if ($uri) list($uri) = $this->parseRouteTemplate($uri);
+        self::$METHOD = $method == '*' ? null : $method;
+        self::$URI = $uri;
 
         Import::only('index.php');
     }
@@ -33,42 +36,45 @@ $interceptor = new class extends Terminal {
 
             foreach (Dir::seekForFile($path, true) as $routeFile) {
                 $file = path($path, $routeFile);
-                self::echo(' - [#]', $file);
 
                 self::$ROUTE = [];
                 Import::only($file, true);
 
-                self::$ROUTE = array_reverse(self::$ROUTE);
+                if (count(self::$ROUTE)) {
+                    self::echo(' - [#]', $file);
+                    self::$ROUTE = array_reverse(self::$ROUTE);
 
-                foreach (self::$ROUTE as &$route) {
-                    $method = $route['method'];
-                    $template = $route['template'];
+                    foreach (self::$ROUTE as &$route) {
+                        $method = $route['method'];
+                        $template = $route['template'];
 
-                    $replaced = '';
-                    if (self::$USED[$method][$template] ?? false) {
-                        $replaced = self::$USED[$method][$template];
+                        $replaced = '';
+                        if (self::$USED[$method][$template] ?? false) {
+                            $replaced = self::$USED[$method][$template];
 
-                        if ($replaced['origin'] == $origin) {
-                            $replaced = prepare(' [replaced in [#file] ([#line])]', $replaced);
-                        } else {
-                            $replaced = prepare(' [replaced in [#origin]: [#file] ([#line])]', $replaced);
+                            if ($replaced['origin'] == $origin) {
+                                $replaced = prepare(' [replaced in [#file] ([#line])]', $replaced);
+                            } else {
+                                $replaced = prepare(' [replaced in [#origin]: [#file] ([#line])]', $replaced);
+                            }
                         }
+
+                        self::$USED[$method][$template] = self::$USED[$method][$template] ?? [
+                            'origin' => $origin,
+                            'file' => $file,
+                            'line' => $route['line'],
+                        ];
+
+                        $route['status'] = $replaced;
                     }
 
-                    self::$USED[$method][$template] = self::$USED[$method][$template] ?? [
-                        'origin' => $origin,
-                        'file' => $file,
-                        'line' => $route['line'],
-                    ];
+                    self::$ROUTE = array_reverse(self::$ROUTE);
 
-                    $route['status'] = $replaced;
+                    foreach (self::$ROUTE as $route)
+                        self::echo('    - [[#method]]: [#call] {[#middlewares]}[#status]', $route);
+
+                    self::echo();
                 }
-
-                self::$ROUTE = array_reverse(self::$ROUTE);
-
-                foreach (self::$ROUTE as $route)
-                    self::echo('    - [[#method]]: [#call] {[#middlewares]}[#status]', $route);
-                self::echo();
             }
         }
     }
@@ -79,22 +85,24 @@ $interceptor = new class extends Terminal {
             $route = implode('/', [...self::$PATH, $route]);
             list($template, $params) = $this->parseRouteTemplate($route);
 
-            $middlewares = [...end(self::$MIDDLEWARES), ...$middlewares];
-            $middlewares = implode(',', $middlewares);
+            if ($this->checkRouteMatch($template)) {
+                $middlewares = [...end(self::$MIDDLEWARES), ...$middlewares];
+                $middlewares = implode(',', $middlewares);
 
-            $line = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]['line'];
+                $line = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]['line'];
 
-            $params = array_map(fn($v) => is_null($v) ? $v : "[#$v]", $params);
-            $call = str_replace('#', '[#]', $template);
-            $call = prepare($call, $params);
+                $params = array_map(fn($v) => is_null($v) ? $v : "[#$v]", $params);
+                $call = str_replace('#', '[#]', $template);
+                $call = prepare($call, $params);
 
-            self::$ROUTE[] = [
-                'method' => strtoupper($method),
-                'template' => $template,
-                'call' => $call,
-                'line' => $line,
-                'middlewares' => $middlewares,
-            ];
+                self::$ROUTE[] = [
+                    'method' => strtoupper($method),
+                    'template' => $template,
+                    'call' => $call,
+                    'line' => $line,
+                    'middlewares' => $middlewares,
+                ];
+            }
         }
     }
 
@@ -166,6 +174,29 @@ $interceptor = new class extends Terminal {
         }
 
         return $route;
+    }
+
+    protected function checkRouteMatch(string $template): bool
+    {
+        if (is_null(self::$URI)) return true;
+
+        $uri = self::$URI;
+        $uri = trim($uri, '/');
+        $uri = explode('/', $uri);
+
+        $template = trim($template, '/');
+        $template = explode('/', $template);
+
+        while (count($uri)) {
+            $received = array_shift($uri) ?? '';
+            if ($received === '...') return true;
+            if (!count($template)) return false;
+            $expected = array_shift($template);
+            if ($expected !== '#' && $received !== $expected) return false;
+            if (is_blank($received) && !is_blank($expected)) return false;
+        }
+
+        return true;
     }
 };
 
