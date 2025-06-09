@@ -1,27 +1,27 @@
 {
-  "name": "phpmx/server",
-  "description": "Camada para servidor de API via PHP MX",
-  "license": "MIT",
-  "authors": [
-    {
-      "name": "André Ricardo",
-      "email": "contatoadmx@gmail.com"
-    }
-  ],
-  "minimum-stability": "dev",
-  "autoload": {
-    "psr-4": {
-      "": "source/"
+    "name": "phpmx/server",
+    "description": "Camada para servidor de API via PHP MX",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "André Ricardo",
+            "email": "contatoadmx@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "autoload": {
+        "psr-4": {
+            "": "source/"
+        },
+        "files": [
+            "helper/constant/http_status.php",
+            "helper/constant/request_is.php",
+            "helper/function/is.php",
+            "helper/script/env.php",
+            "helper/script/path.php"
+        ]
     },
-    "files": [
-      "helper/constant/http_status.php",
-      "helper/constant/request_is.php",
-      "helper/function/is.php",
-      "helper/script/env.php",
-      "helper/script/path.php"
-    ]
-  },
-  "require": {
-    "phpmx/core": "dev-main"
-  }
+    "require": {
+        "phpmx/core": "dev-main"
+    }
 }
