@@ -1,0 +1,19 @@
+<?php
+
+use PhpMx\Dir;
+use PhpMx\File;
+use PhpMx\Terminal;
+
+return new class extends Terminal {
+
+    function __invoke()
+    {
+        Dir::create('middleware');
+        Dir::create('routes');
+        Dir::create('source/Controller');
+        Dir::create('storage/assets');
+        Dir::create('storage/download');
+
+        File::copy(path(dirname(__FILE__, 2), 'index.php'), 'index.php');
+    }
+};
