@@ -18,7 +18,7 @@ return new class extends Terminal {
             self::echoLine();
 
             foreach ($this->getFilesIn($path, $origin) as $file) {
-                self::echo(' - [#ref] ([#file]) [[#status]]', $file);
+                self::echo(' - [#ref] ([#file])[#status]', $file);
             };
 
             self::echo();
@@ -53,7 +53,7 @@ return new class extends Terminal {
             $files[$ref] = [
                 'ref' => $ref,
                 'file' => $file,
-                'status' => $this->used[$ref] == $origin ? 'ok' : 'replaced in ' . $this->used[$ref]
+                'status' => $this->used[$ref] == $origin ? '' : ' [replaced in ' . $this->used[$ref] . ']'
             ];
         }
         ksort($files);

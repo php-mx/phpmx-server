@@ -200,26 +200,28 @@ $interceptor = new class extends Terminal {
     }
 };
 
-abstract class Router
-{
-    static $interceptor;
-
-    static function __callStatic($name, $arguments)
+if (!class_exists('\PhpMx\Router', false)) {
+    abstract class Router
     {
-        return match ($name) {
-            'get',
-            'post',
-            'put',
-            'delete', => self::$interceptor->route($name, ...$arguments),
-            'solve',
-            'path',
-            'middleware',
-            'group' => self::$interceptor->{$name}(...$arguments),
-            default => null,
-        };
-    }
-};
+        static $interceptor;
 
-Router::$interceptor = $interceptor;
+        static function __callStatic($name, $arguments)
+        {
+            return match ($name) {
+                'get',
+                'post',
+                'put',
+                'delete', => self::$interceptor->route($name, ...$arguments),
+                'solve',
+                'path',
+                'middleware',
+                'group' => self::$interceptor->{$name}(...$arguments),
+                default => null,
+            };
+        }
+    };
+
+    Router::$interceptor = $interceptor;
+}
 
 return $interceptor;
