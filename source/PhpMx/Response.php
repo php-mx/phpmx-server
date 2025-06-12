@@ -25,7 +25,7 @@ abstract class Response
             foreach ($name as $n => $v)
                 self::header($n, $v);
         } else {
-            self::$HEADER[$name] = $value;
+            log_add('mx', 'set response.header[[#]]', [$name], fn() => self::$HEADER[$name] = $value);
         }
     }
 
@@ -38,20 +38,22 @@ abstract class Response
             $type = Mime::getMimeEx($type) ?? $type;
         }
 
-        self::$TYPE = $replace ? $type : (self::$TYPE ?? $type);
+        if ($replace || is_null(self::$TYPE))
+            log_add('mx', 'set response.type [#]', [str_get_var($type)], fn() => self::$TYPE = $type);
     }
 
     /** Define o conteúdo da resposta */
     static function content(mixed $content, bool $replace = true)
     {
-        self::$CONTENT = $replace ? $content : (self::$CONTENT ?? $content);
+        if ($replace || is_null(self::$CONTENT))
+            log_add('mx', 'set response.content [...]', [], fn() => self::$CONTENT = $content);
     }
 
     /** Define se o arquivo deve ser armazenado em cache */
     static function cache(null|bool|string $strToTime): void
     {
         if (is_bool($strToTime)) $strToTime = $strToTime ? null : '';
-        self::$CACHE = $strToTime;
+        log_add('mx', 'set response.cache [#]', [str_get_var($strToTime)], fn() => self::$CACHE = $strToTime);
     }
 
     /** Define se o navegador deve fazer download da resposta */
