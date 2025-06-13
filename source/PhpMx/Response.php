@@ -25,7 +25,7 @@ abstract class Response
             foreach ($name as $n => $v)
                 self::header($n, $v);
         } else {
-            log_add('mx', 'set response.header[[#]]', [$name], fn() => self::$HEADER[$name] = $value);
+            log_add('mx', 'set response.header [[#]]', [$name], fn() => self::$HEADER[$name] = $value);
         }
     }
 
