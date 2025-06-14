@@ -2,5 +2,5 @@
 /vendor
 /composer.lock
 
-#phpmx-core
+#phpmx-cif
 /storage/certificate
