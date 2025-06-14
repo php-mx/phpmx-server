@@ -23,6 +23,7 @@
     },
     "require": {
         "phpmx/core": "dev-main",
-        "phpmx/cif": "dev-main"
+        "phpmx/cif": "dev-main",
+        "phpmx/code": "dev-main"
     }
 }
