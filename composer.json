@@ -1,6 +1,6 @@
 {
     "name": "phpmx/server",
-    "description": "Camada para servidor de API via PHP MX",
+    "description": "Camada para servidor de API via PHPMX",
     "license": "MIT",
     "authors": [
         {
@@ -22,8 +22,6 @@
         ]
     },
     "require": {
-        "phpmx/core": "dev-main",
-        "phpmx/cif": "dev-main",
-        "phpmx/code": "dev-main"
+        "phpmx/core": "dev-main"
     }
 }
