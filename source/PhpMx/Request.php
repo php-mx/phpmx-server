@@ -181,7 +181,7 @@ abstract class Request
     {
         if ($_SERVER['HTTP_HOST']) return $_SERVER['HTTP_HOST'];
 
-        $parse = parse_url(env('BASE_URL'));
+        $parse = parse_url(env('TERMINAL_URL'));
 
         $host = $parse['host'];
 

@@ -10,12 +10,12 @@ return new class extends Terminal {
         if (!File::check('index.php'))
             throw new Exception('[index.php] not found');
 
-        $port = parse_url(env('BASE_URL'))['port'];
+        $port = parse_url(env('TERMINAL_URL'))['port'];
         $port = $port ? ":$port" : '';
 
         self::echoLine();
         self::echo('| Starting PHP server');
-        self::echo('| Visit [[#]]', env('BASE_URL'));
+        self::echo('| Visit [[#]]', env('TERMINAL_URL'));
         self::echo('| Use [[#]] to terminate the server', "CTRL + C");
         self::echoLine();
         self::echo('');

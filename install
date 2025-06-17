@@ -2,6 +2,7 @@
 
 use PhpMx\Dir;
 use PhpMx\File;
+use PhpMx\Import;
 use PhpMx\Terminal;
 
 return new class extends Terminal {
@@ -15,5 +16,14 @@ return new class extends Terminal {
         Dir::create('storage/download');
 
         File::copy(path(dirname(__FILE__, 1), 'index.php'), 'index.php');
+
+        $ignore = Import::content('.env');
+
+        if (strpos($ignore, "#phpmx-server") === false) {
+            $ignore .= "\n#phpmx-server";
+            $ignore .= "\nTERMINAL_URL = http://localhost:8888";
+            $ignore .= "\n";
+            File::create('.env', $ignore, true);
+        }
     }
 };

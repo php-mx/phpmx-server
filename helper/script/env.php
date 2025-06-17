@@ -4,8 +4,7 @@ use PhpMx\Env;
 
 Env::default('FORCE_SSL', false);
 
-Env::default('BASE_URL', 'http://localhost:8888');
-Env::default('FRONT_URL', 'http://localhost:3000/');
+Env::default('TERMINAL_URL', 'http://localhost:8888');
 
 Env::default('JWT', 'jwt-key');
 
