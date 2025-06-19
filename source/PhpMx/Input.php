@@ -15,9 +15,7 @@ class Input
 {
     protected array $dataValue = [];
 
-    /**
-     * @var InputField[]
-     */
+    /** @var InputField[] */
     protected array $dataField = [];
 
     function __construct(?array $dataValue = null)
@@ -101,7 +99,7 @@ class Input
         return $return;
     }
 
-    /** Retorna os valores dos campos do input em forma de array */
+    /** Retorna os valores recebidos dos campos do input em forma de array */
     function dataRecived(?array $nameFields = null): array
     {
         $nameFields = $nameFields ?? array_keys($this->dataField);

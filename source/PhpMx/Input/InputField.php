@@ -54,7 +54,7 @@ class InputField
         throw new Exception(json_encode($send), $status);
     }
 
-    /** Define se o campo é obeigatório */
+    /** Define se o campo é obrigatório */
     function required(bool $required, ?string $errorMessage = null, ?int $errorStatus = STS_BAD_REQUEST): static
     {
         $this->required = $required;
@@ -101,7 +101,7 @@ class InputField
                 $this->valueSanitized = $rule($this->valueSanitized);
             }
 
-            if (is_array($this->scapePrepare))
+            if (count($this->scapePrepare))
                 $this->valueSanitized = Prepare::scape($this->valueSanitized, $this->scapePrepare);
 
             $this->sanitized = true;
