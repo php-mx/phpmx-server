@@ -220,19 +220,19 @@ abstract class Request
     {
         $data = [];
 
-        if (IS_POST)
-            $data = $_POST;
+        $inputData = file_get_contents('php://input');
 
-        if (IS_GET || IS_PUT || IS_DELETE) {
-            $inputData = file_get_contents('php://input');
-            if (is_json($inputData)) {
-                $data = json_decode($inputData, true);
-            } else {
-                parse_str($inputData, $data);
-            }
+        if (is_json($inputData)) {
+            $data = json_decode($inputData, true);
+        } elseif (IS_POST) {
+            $data = $_POST;
+        } elseif (IS_GET || IS_PUT || IS_DELETE) {
+            parse_str($inputData, $data);
         }
 
-        return array_map(fn($var) => str_get_var($var), $data);
+        array_walk_recursive($data, fn(&$v) => $v = str_get_var($v));
+
+        return $data;
     }
 
     protected static function current_file(): array
