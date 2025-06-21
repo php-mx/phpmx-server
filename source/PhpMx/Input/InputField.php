@@ -42,7 +42,7 @@ class InputField
         if ($status === true) $status = STS_OK;
         if ($status === false || !is_httpStatus($status)) $status = STS_BAD_REQUEST;
 
-        $prepare['name'] = $this->name;
+        $prepare['name'] = $this->alias;
         $message = InputMessage::get($message ?? 'default') ?? $message;
         $message = prepare($message, $prepare);
 
