@@ -35,10 +35,10 @@ return new class {
             'data' => $response
         ];
 
-        if (env('DEV'))
-            $response['log'] = Log::getArray();
-
         Response::status($status);
+
+        if (env('DEV')) $response['log'] = Log::getArray();
+
         Response::content($response);
     }
 
@@ -72,9 +72,6 @@ return new class {
                 'data' => null
             ];
 
-            if (env('DEV'))
-                $response['log'] = Log::getArray();
-
             Response::header('Mx-Error-Message', $response['info']['message']);
             Response::header('Mx-Error-Status', $response['info']['status']);
 
@@ -86,6 +83,9 @@ return new class {
             }
 
             Response::cache(false);
+
+            if (env('DEV')) $response['log'] = Log::getArray();
+
             Response::content($response);
         }
 
