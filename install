@@ -17,13 +17,14 @@ return new class extends Terminal {
 
         File::copy(path(dirname(__FILE__, 1), 'index.php'), 'index.php');
 
-        $ignore = Import::content('.env');
+        $env = Import::content('.env');
 
-        if (strpos($ignore, "#phpmx-server") === false) {
-            $ignore .= "\n#phpmx-server";
-            $ignore .= "\nTERMINAL_URL = http://localhost:8888";
-            $ignore .= "\n";
-            File::create('.env', $ignore, true);
+        if (strpos($env, "#phpmx-server") === false) {
+            $env .= "\n#phpmx-server";
+            $env .= "\nFORCE_SSL = false";
+            $env .= "\nTERMINAL_URL = http://localhost:8888";
+            $env .= "\n";
+            File::create('.env', $env, true);
         }
     }
 };
