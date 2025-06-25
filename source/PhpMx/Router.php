@@ -115,7 +115,6 @@ abstract class Router
             $params,
             $middlewares
         ];
-        log_add('route', $template);
     }
 
     /** Explode uma rota em [template,params] */

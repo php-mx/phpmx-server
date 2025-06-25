@@ -126,27 +126,27 @@ abstract class Request
     static function set_header(string|int $name, mixed $value): void
     {
         self::$HEADER = self::$HEADER ?? self::current_header();
-        log_add('mx', 'set request.header[[#]]', [$name], fn() => self::$HEADER[$name] = $value);
+        self::$HEADER[$name] = $value;
     }
 
     /** Define o valor de um parametro query da requisição atual */
     static function set_query(string|int $name, mixed $value): void
     {
         self::$QUERY = self::$QUERY ?? self::current_query();
-        log_add('mx', 'set request.query[[#]]', [$name], fn() => self::$QUERY[$name] = $value);
+        self::$QUERY[$name] = $value;
     }
 
     /** Define o valor de um parametro do corpo da requisição atual */
     static function set_body(string|int $name, mixed $value): void
     {
         self::$BODY = self::$BODY ?? self::current_query();
-        log_add('mx', 'set request.body[[#]]', [$name], fn() => self::$BODY[$name] = $value);
+        self::$BODY[$name] = $value;
     }
 
     /** Define o valor de um parametro de rota da requisição atual */
     static function set_route(string|int $name, mixed $value): void
     {
-        log_add('mx', 'set request.route[[#]]', [$name], fn() => self::$ROUTE[$name] = $value);
+        self::$ROUTE[$name] = $value;
     }
 
     #==| LOAD |==#
