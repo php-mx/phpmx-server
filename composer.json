@@ -21,6 +21,6 @@
         ]
     },
     "require": {
-        "phpmx/core": "^1.0"
+        "phpmx/core": "^1.1"
     }
 }
