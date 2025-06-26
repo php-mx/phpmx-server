@@ -75,6 +75,8 @@ php mx create.controller meuController
 
 Arquivo principal de entrada da aplicação. Toda requisição HTTP deve ser direcionada para este arquivo.
 
+> Todas as requisições devem ser redirecionadas para o arquivo index.php, independentemente da existência de arquivos, extensões ou pastas com o mesmo nome da URL requisitada. O servidor não deve servir nenhum arquivo ou diretório diretamente. A responsabilidade do roteamento é exclusiva da aplicação.
+
 ---
 
 ## Documentação
