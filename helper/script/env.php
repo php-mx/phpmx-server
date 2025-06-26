@@ -2,7 +2,7 @@
 
 use PhpMx\Env;
 
-Env::default('FORCE_SSL', false);
+Env::default('FORCE_SSL', true);
 
 Env::default('TERMINAL_URL', 'http://localhost:8888');
 
