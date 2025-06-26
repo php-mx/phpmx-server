@@ -16,13 +16,13 @@ return new class extends Terminal {
         Dir::create('storage/download');
 
         File::copy(path(dirname(__FILE__, 1), 'index.php'), 'index.php');
+        File::copy(path(dirname(__FILE__, 1), '.htaccess'), '.htaccess');
 
         $env = Import::content('.env');
 
         if (strpos($env, "#phpmx-server") === false) {
             $env .= "\n#phpmx-server";
             $env .= "\nFORCE_SSL = false";
-            $env .= "\nTERMINAL_URL = http://localhost:8888";
             $env .= "\n";
             File::create('.env', $env, true);
         }
