@@ -76,7 +76,7 @@ return new class {
             Response::header('Mx-Error-Message', $response['info']['message']);
             Response::header('Mx-Error-Status', $response['info']['status']);
 
-            if (env('DEV')) {
+            if (env('DEV') && is_httpStatusError($status)) {
                 $response['info']['file'] = $e->getFile();
                 $response['info']['line'] = $e->getLine();
                 Response::header('Mx-Error-File', $response['info']['file']);
