@@ -1,6 +1,6 @@
 <?php
 
-namespace Controller\Base;
+namespace Controller\MxServer;
 
 use PhpMx\Path;
 use PhpMx\Request;
