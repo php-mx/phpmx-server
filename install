@@ -15,6 +15,10 @@ return new class extends Terminal {
 
         self::promote('.htaccess');
         self::promote('index.php');
+
+        self::blockFile('.env', 'MX SERVER', [
+            'FORCE_SSL = false'
+        ]);
     }
 
     /** Promove um arquivo para o projeto atual */
