@@ -1,6 +1,6 @@
 {
     "name": "phpmx/server",
-    "description": "Camada para servidor de api phpmx",
+    "description": "Camada para servidor de api phpMX",
     "license": "MIT",
     "authors": [
         {
