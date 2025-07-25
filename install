@@ -56,7 +56,9 @@ return new class extends Terminal {
         $fileContent = Import::content($pathFile) ?? '';
 
         if (!str_contains($fileContent, "# $blockName")) {
-            $fileContent .= "\n# $blockName\n\n" . implode("\n", $contentLines);
+            $fileContent = empty($fileContent) ? "# $blockName\n\n" : "$fileContent\n# $blockName\n\n";
+            $fileContent .=  implode("\n", $contentLines);
+            $fileContent .=  "\n";
             File::create($pathFile, $fileContent, true);
             self::echo("block file: $blockName ($pathFile) [added]");
         } else {
