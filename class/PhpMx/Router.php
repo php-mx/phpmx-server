@@ -21,6 +21,15 @@ abstract class Router
         self::post($route, $response, $middlewares);
     }
 
+    /** Adiciona uma rota para responder por requisições GET, POST, PUT e DELETE */
+    static function full(string $route, string|array|int $response, array $middlewares = []): void
+    {
+        self::get($route, $response, $middlewares);
+        self::post($route, $response, $middlewares);
+        self::put($route, $response, $middlewares);
+        self::delete($route, $response, $middlewares);
+    }
+
     /** Adiciona uma rota para responder por requisições GET */
     static function get(string $route, string|array|int $response, array $middlewares = []): void
     {
