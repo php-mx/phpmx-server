@@ -1,6 +1,6 @@
 <?php
 
-namespace Controller\Base;
+namespace Controller\MxServer;
 
 use Exception;
 use PhpMx\Cif;

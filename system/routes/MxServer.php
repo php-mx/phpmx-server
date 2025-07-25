@@ -9,4 +9,6 @@ Router::get('favicon.ico', \Controller\MxServer\Favicon::class);
 Router::get('robots.txt', \Controller\MxServer\Robots::class);
 Router::get('sitemap.xml', \Controller\MxServer\Sitemap::class);
 
+Router::get('captcha', \Controller\MxServer\Captcha::class);
+
 Router::get('', STS_OK);
