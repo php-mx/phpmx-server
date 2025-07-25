@@ -21,6 +21,9 @@
             "system/helper/script/path.php"
         ]
     },
+    "suggest": {
+        "ext-gd": "Required if you intend to use Captcha input."
+    },
     "require": {
         "phpmx/core": "dev-main"
     }
