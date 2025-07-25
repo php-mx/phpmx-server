@@ -1,6 +1,6 @@
 {
     "name": "phpmx/server",
-    "description": "Camada para servidor de API via PHPMX",
+    "description": "Camada para servidor de api phpmx",
     "license": "MIT",
     "authors": [
         {
@@ -8,19 +8,16 @@
             "email": "contatoadmx@gmail.com"
         }
     ],
+    "minimum-stability": "dev",
     "autoload": {
         "psr-4": {
-            "": "source/"
+            "": "class/"
         },
         "files": [
-            "helper/constant/http_status.php",
-            "helper/constant/request_is.php",
-            "helper/function/is.php",
-            "helper/script/env.php",
-            "helper/script/path.php"
+            "system/helper/script/path.php"
         ]
     },
     "require": {
-        "phpmx/core": "^1.1"
+        "phpmx/core": "dev-main"
     }
 }
