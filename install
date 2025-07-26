@@ -13,6 +13,9 @@ return new class extends Terminal {
         self::createDir('library/assets');
         self::createDir('library/download');
 
+        self::createDir('system/middleware');
+        self::createDir('system/routes');
+
         self::promote('.htaccess');
         self::promote('index.php');
 
