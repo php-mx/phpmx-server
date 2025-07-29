@@ -6,6 +6,7 @@ use Closure;
 use Exception;
 use PhpMx\Prepare;
 
+/** Classe para definição, validação e sanitização de campos de input. */
 class InputField
 {
     protected string $name;

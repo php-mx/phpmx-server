@@ -4,6 +4,7 @@ namespace PhpMx\Input;
 
 use PhpMx\Mime;
 
+/** Campo de input para validação de imagens base64. */
 class InputFieldUploadImage extends InputField
 {
     function __construct(string $name, ?string $alias = null, mixed $value = null)

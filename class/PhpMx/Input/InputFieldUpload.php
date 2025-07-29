@@ -2,6 +2,7 @@
 
 namespace PhpMx\Input;
 
+/** Campo de input para validação de arquivos enviados (upload). */
 class InputFieldUpload extends InputField
 {
     function __construct(string $name, ?string $alias = null, mixed $value = null)

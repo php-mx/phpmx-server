@@ -2,6 +2,7 @@
 
 namespace PhpMx;
 
+/** Classe utilitária para criação e validação de tokens JWT. */
 abstract class Jwt
 {
     /** Retorna o token JWT  */

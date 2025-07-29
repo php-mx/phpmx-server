@@ -2,6 +2,7 @@
 
 namespace PhpMx\Input;
 
+/** Campo de input especializado para valores booleanos. */
 class InputFieldBool extends InputField
 {
     function __construct(string $name, ?string $alias = null, mixed $value = null)

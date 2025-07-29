@@ -6,6 +6,7 @@ use Closure;
 use Exception;
 use ReflectionMethod;
 
+/** Classe responsável pelo registro, organização e resolução de rotas HTTP. */
 abstract class Router
 {
     protected static array $ROUTE = [];

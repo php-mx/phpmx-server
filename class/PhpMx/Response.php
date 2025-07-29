@@ -2,6 +2,7 @@
 
 namespace PhpMx;
 
+/** Classe utilitária para construção e envio de respostas HTTP. */
 abstract class Response
 {
     protected static array $HEADER = [];

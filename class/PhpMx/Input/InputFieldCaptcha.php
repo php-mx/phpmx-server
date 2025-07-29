@@ -6,6 +6,7 @@ use PhpMx\Cif;
 use PhpMx\Mx5;
 use Throwable;
 
+/** Campo de input para validação de captchas com cifra e hash. */
 class InputFieldCaptcha extends InputField
 {
     function __construct(string $name, ?string $alias = null, mixed $value = null)

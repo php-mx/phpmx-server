@@ -12,6 +12,7 @@ use PhpMx\Input\InputFieldUpload;
 use PhpMx\Input\InputFieldUploadImage;
 use PhpMx\Request;
 
+/** Classe para gerenciamento de campos e validação de inputs da requisição. */
 class Input
 {
     protected array $dataValue = [];

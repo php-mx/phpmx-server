@@ -2,6 +2,7 @@
 
 namespace PhpMx\Input;
 
+/** Classe utilitária para gerenciamento de mensagens de erro em inputs. */
 abstract class InputMessage
 {
     protected static array $TYPE = [

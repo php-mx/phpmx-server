@@ -4,6 +4,7 @@ namespace PhpMx;
 
 use Exception;
 
+/** Classe utilitária para envio e download de arquivos via resposta HTTP. */
 abstract class Assets
 {
     /** Envia um arquivo do projeto como resposta da requisição */

@@ -4,6 +4,7 @@ namespace PhpMx;
 
 use Exception;
 
+/** Classe responsável pela execução encadeada de middlewares. */
 class Middleware
 {
     protected static array $QUEUE = [];

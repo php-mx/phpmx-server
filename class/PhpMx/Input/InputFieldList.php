@@ -2,6 +2,7 @@
 
 namespace PhpMx\Input;
 
+/** Campo de input para listas representadas como string. */
 class InputFieldList extends InputField
 {
     function __construct(string $name, ?string $alias = null, mixed $value = null)

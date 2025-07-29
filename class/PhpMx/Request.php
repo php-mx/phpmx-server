@@ -2,6 +2,7 @@
 
 namespace PhpMx;
 
+/** Classe utilitária para acesso aos dados da requisição HTTP atual. */
 abstract class Request
 {
     protected static ?string $TYPE = null;

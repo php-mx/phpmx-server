@@ -2,6 +2,7 @@
 
 namespace PhpMx\Input;
 
+/** Campo de input para validação e decodificação de esquemas JSON. */
 class InputFieldScheme extends InputField
 {
     function __construct(string $name, ?string $alias = null, mixed $value = null)
