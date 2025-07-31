@@ -11,7 +11,7 @@ return new class extends TerminalInstall {
         self::createDir('library/download');
 
         self::createDir('system/middleware');
-        self::createDir('system/routes');
+        self::createDir('system/route');
 
         self::promote('.htaccess');
         self::promote('index.php');
