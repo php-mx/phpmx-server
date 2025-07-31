@@ -118,10 +118,10 @@ abstract class Router
     {
         self::$SCAN_TYPE = strtolower($method);
 
-        $routes = cache("route-$method", function () {
+        $routes = cache("routes-$method", function () {
             self::$ROUTE = [];
 
-            foreach (array_reverse(Path::seekForDirs('system/route')) as $path)
+            foreach (array_reverse(Path::seekForDirs('system/router')) as $path)
                 foreach (Dir::seekForFile($path, true) as $file)
                     Import::only("$path/$file", false);
 

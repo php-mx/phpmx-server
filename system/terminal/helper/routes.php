@@ -110,7 +110,7 @@ $interceptor = new class extends Terminal {
 
     protected function getOrigim($path)
     {
-        if ($path === 'system/route') return 'CURRENT-PROJECT';
+        if ($path === 'system/router') return 'CURRENT-PROJECT';
 
         if (str_starts_with($path, 'vendor/')) {
             $parts = explode('/', $path);
@@ -213,7 +213,7 @@ if ($interceptor->intercepting) {
         {
             self::$ROUTE = [];
 
-            foreach (array_reverse(Path::seekForDirs('system/route')) as $path)
+            foreach (array_reverse(Path::seekForDirs('system/router')) as $path)
                 foreach (Dir::seekForFile($path, true) as $file)
                     Import::only("$path/$file", false);
 
