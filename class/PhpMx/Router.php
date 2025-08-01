@@ -221,33 +221,38 @@ abstract class Router
     protected static function organize(array $array): array
     {
         uksort($array, function ($a, $b) {
-            $nBarrA = substr_count($a, '/');
-            $nBarrB = substr_count($b, '/');
+            $countA = substr_count($a, '/');
+            $countB = substr_count($b, '/');
 
-            if ($nBarrA != $nBarrB) return $nBarrB <=> $nBarrA;
+            if ($countA !== $countB) return $countB <=> $countA;
 
-            $arrayA = explode('/', $a);
-            $arrayB = explode('/', $b);
-            $na = '';
-            $nb = '';
-            $max = max(count($arrayA), count($arrayB));
+            $posA = strpos($a, '/');
+            $posB = strpos($b, '/');
 
-            $dynamicParamWeight  =  ['#' => '1',  '...' => '2'];
+            if ($posA !== $posB) return $posB <=> $posA;
+
+            $aParts = explode('/', $a);
+            $bParts = explode('/', $b);
+
+            $max = max(count($aParts), count($bParts));
+
+            $peso = fn($part) => match ($part) {
+                '...' => 2,
+                '#' => 1,
+                default => 0,
+            };
+
             for ($i = 0; $i < $max; $i++) {
-                $aVal = $arrayA[$i] ?? '';
-                $bVal = $arrayB[$i] ?? '';
-                $na .= $dynamicParamWeight[$aVal] ?? '0';
-                $nb .= $dynamicParamWeight[$bVal] ?? '0';
+                $partA = $aParts[$i] ?? '';
+                $partB = $bParts[$i] ?? '';
+
+                $pesoA = $peso($partA);
+                $pesoB = $peso($partB);
+
+                if ($pesoA !== $pesoB) return $pesoA <=> $pesoB;
             }
 
-            $result = intval($na) <=> intval($nb);
-            if ($result) return $result;
-
-            $result = count($arrayA) <=> count($arrayB);
-            if ($result) return $result * -1;
-
-            $result = strlen($a) <=> strlen($b);
-            if ($result) return $result * -1;
+            return 0;
         });
 
         return $array;
