@@ -7,6 +7,7 @@ return new class extends TerminalInstall {
     function __invoke()
     {
         self::createDir('class/Controller');
+
         self::createDir('library/assets');
         self::createDir('library/download');
 
