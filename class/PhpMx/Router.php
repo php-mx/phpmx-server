@@ -284,32 +284,66 @@ abstract class Router
     /** Executa uma resposta de rota */
     protected static function executeActionResponse(string|array|int $response, array $data = [])
     {
-        if (is_httpStatus($response))
-            return $response;
+        $response = is_array($response) ? $response : [$response];
 
-        if (is_int($response))
+        $action = array_shift($response) ?? STS_NOT_FOUND;
+
+        if ($action == STS_REDIRECT) {
+            $url = array_shift($response) ?? env("STM_303") ?? 'unknown';
+
+            $prepare = [];
+
+            foreach (Prepare::tags($url) as $tag) {
+                if (!isset($data[$tag]))
+                    throw new Exception("Parameter [$tag] is required", STS_INTERNAL_SERVER_ERROR);
+                $prepare[$tag] = $data[$tag];
+                unset($data[$tag]);
+            }
+
+            $url = prepare($url, [...$prepare, $data]);
+
+            if (str_ends_with($url, '...')) {
+                $url = str_ends_with($url, '/...') ? substr($url, 0, -4) : substr($url, 0, -3);
+                $url .= '/' . implode('/', array_values($data));
+            }
+
+            return redirect($url, Request::query());
+        }
+
+        if (is_httpStatus($action)) {
+            $status = $action;
+            $message = array_shift($response) ?? env("STM_$status") ?? 'unknown';
+            $message = prepare($message, $data);
+            throw new Exception($message, $status);
+        }
+
+        if (is_int($action)) {
             throw new Exception('response route error', STS_INTERNAL_SERVER_ERROR);
+        }
 
-        $response = is_array($response) ? $response : [$response, '__invoke'];
+        if (is_stringable($action)) {
+            $class = $action;
+            $method = array_shift($response) ?? '__invoke';
 
-        list($class, $method) = $response;
+            if (!class_exists($class))
+                throw new Exception('route not implemented', STS_NOT_IMPLEMENTED);
 
-        if (!class_exists($class))
-            throw new Exception('route not implemented', STS_NOT_IMPLEMENTED);
+            $__constructParams = [];
 
-        $__constructParams = [];
+            if (method_exists($class, '__construct'))
+                $__constructParams = self::getMethodParams($class, '__construct', $data);
 
-        if (method_exists($class, '__construct'))
-            $__constructParams = self::getMethodParams($class, '__construct', $data);
+            $response = new $class(...$__constructParams);
 
-        $response = new $class(...$__constructParams);
+            if (!method_exists($response, $method))
+                throw new Exception("Method [$method] does not exist in response class", STS_NOT_IMPLEMENTED);
 
-        if (!method_exists($response, $method))
-            throw new Exception("Method [$method] does not exist in response class", STS_NOT_IMPLEMENTED);
+            $response = $response->{$method}(...self::getMethodParams($class, $method, $data));
 
-        $response = $response->{$method}(...self::getMethodParams($class, $method, $data));
+            return $response;
+        }
 
-        return $response;
+        throw new Exception('response route error', STS_INTERNAL_SERVER_ERROR);
     }
 
     /** Retorna os parametros que deve ser utilizados para chamar um metodo de um objeto de resposa */
