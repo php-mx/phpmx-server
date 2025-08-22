@@ -11,18 +11,19 @@ return new class extends Terminal {
     {
         $middleware = remove_accents($middleware);
 
-        $middlewareFile = explode('.', $middleware);
-        $middlewareFile = path('system/middleware', ...$middlewareFile);
-        $middlewareFile = File::setEx($middlewareFile, 'php');
+        $file = explode('.', $middleware);
+        $file = path('system/middleware', ...$file);
+        $file = File::setEx($file, 'php');
 
-        if (File::check($middlewareFile))
+        if (File::check($file))
             throw new Exception("Middleware [$middleware] already exists in project");
 
         $template = Path::seekForFile('library/template/terminal/middleware.txt');
         $template = Import::content($template, ['middleware' => $middleware]);
 
-        File::create($middlewareFile, $template);
+        File::create($file, $template);
 
         self::echo('middleware [[#]] created successfully', $middleware);
+        self::echo('[[#]]', $file);
     }
 };

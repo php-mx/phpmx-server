@@ -30,5 +30,6 @@ return new class extends Terminal {
         File::create($file, $template);
 
         self::echo("Controller [$file] created successfully");
+        self::echo('[[#]]', $file);
     }
 };
