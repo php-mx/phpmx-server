@@ -8,7 +8,6 @@
             "email": "contatoadmx@gmail.com"
         }
     ],
-    "minimum-stability": "dev",
     "autoload": {
         "psr-4": {
             "": "class/"
@@ -27,6 +26,6 @@
         "ext-gd": "Required if you intend to use Captcha input."
     },
     "require": {
-        "phpmx/core": "dev-main"
+        "phpmx/core": "^2.0"
     }
 }
