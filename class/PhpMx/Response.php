@@ -68,7 +68,7 @@ class Response
     }
 
     /** Envia a resposta ao navegador do cliente */
-    function send(): never
+    function send(): void
     {
         $content = $this->getMontedContent();
         $headers = $this->getMontedHeders();
