@@ -8,38 +8,38 @@ use Exception;
 abstract class Assets
 {
     /** Envia um arquivo do projeto como resposta da requisição */
-    static function send(): never
+    static function send(Response $response, ...$assetArgs): never
     {
         self::load(...func_get_args());
-        Response::send();
+        $response->send();
     }
 
     /** Realiza o download de um arquivo do projeto como resposta da requisição */
-    static function download(): never
+    static function download(Response $response, ...$assetArgs): never
     {
         self::load(...func_get_args());
-        Response::download(true);
-        Response::send();
+        $response->download(true);
+        $response->send();
     }
 
     /** Carrega um arquivo do projeto na resposta da requisição */
-    static function load(): void
+    static function load(Response $response, ...$assetArgs): void
     {
-        $file = path(...func_get_args());
-        self::loadResponse($file);
-        Response::download(false);
+        $file = path(...$assetArgs);
+        self::loadResponse($response, $file);
+        $response->download(false);
     }
 
     /** Retorna o ResponseFile do arquivo */
-    protected static function loadResponse(string $file): void
+    protected static function loadResponse(Response $response, string $file): void
     {
         if (!File::check($file))
             throw new Exception("File not found", STS_NOT_FOUND);
 
-        Response::content(Import::content($file));
+        $response->content(Import::content($file));
 
-        Response::type(File::getEx($file));
-        Response::download(File::getOnly($file));
-        Response::status(STS_OK);
+        $response->type(File::getEx($file));
+        $response->download(File::getOnly($file));
+        $response->status(STS_OK);
     }
 }

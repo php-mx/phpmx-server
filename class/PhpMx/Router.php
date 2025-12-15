@@ -82,19 +82,22 @@ abstract class Router
     }
 
     /** Resolve a requisição atual enviando a reposta ao cliente */
-    static function solve(array $globalMiddlewares = [])
+    static function solve(array $globalMiddlewares = [], ?Request $contextRequest = null, ?Response $contextResponse = null)
     {
+        $contextRequest = $contextRequest ?? new Request;
+        $contextResponse = $contextResponse ?? new Response;
+
         self::$MIDDLEWARES = [$globalMiddlewares];
 
-        list($middlewares, $wrapper) = Log::add('mx', 'router solve', function () {
-            $routes = self::scan(Request::type());
+        list($middlewares, $wrapper) = Log::add('mx', 'router solve', function () use ($contextRequest, $contextResponse) {
+            $routes = self::scan($contextRequest->type());
 
-            $routeMatch = self::getRouteMatch($routes);
+            $routeMatch = self::getRouteMatch($contextRequest->path(), $routes);
 
             if ($routeMatch) {
                 list($template, $response, $params, $middlewares) = $routeMatch;
-                self::setRequestRouteParams($template, $params);
-                $wrapper = fn() => self::executeActionResponse($response, Request::data());
+                self::setRequestRouteParams($contextRequest, $template, $params);
+                $wrapper = fn() => self::executeActionResponse($response, $contextRequest, $contextResponse);
             } else {
                 $wrapper = fn() => throw new Exception('Route not found', STS_NOT_FOUND);
                 $middlewares = self::$MIDDLEWARES;
@@ -103,13 +106,13 @@ abstract class Router
             return [$middlewares, $wrapper];
         });
 
-        Log::add('mx', 'route dispatch', function () use ($middlewares, $wrapper) {
+        Log::add('mx', 'route dispatch', function () use ($middlewares, $wrapper, $contextRequest, $contextResponse) {
             $wrapper = fn() => Log::add('mx', 'route action', $wrapper);
 
-            $response = Middleware::run($middlewares, $wrapper);
+            $middlewareQueue = new MiddlewareQueue($contextRequest, $contextResponse);
 
-            Response::content($response);
-            Response::send();
+            $contextResponse->content($middlewareQueue($middlewares, $wrapper));
+            $contextResponse->send();
         });
     }
 
@@ -190,31 +193,29 @@ abstract class Router
     }
 
     /** Retorna o template da rota que corresponde a URL atual */
-    protected static function getRouteMatch($routes): ?array
+    protected static function getRouteMatch(array $path, $routes): ?array
     {
         foreach ($routes as $template => $route)
-            if (self::checkRouteMatch($template))
+            if (self::checkRouteMatch($path, $template))
                 return $route;
         Log::add('mx', 'route matching not found');
         return null;
     }
     /** Verifica se um template combina com a URL atual */
-    protected static function checkRouteMatch(string $template): bool
+    protected static function checkRouteMatch(array $path, string $template): bool
     {
-        $uri = Request::path();
-
         $template = trim($template, '/');
         $template = explode('/', $template);
 
         while (count($template)) {
             $expected = array_shift($template);
-            $received = array_shift($uri) ?? '';
+            $received = array_shift($path) ?? '';
             if ($expected === '...') return true;
             if (is_blank($received) && !is_blank($expected)) return false;
             if ($expected !== '#' && $received !== $expected) return false;
         }
 
-        return count($uri) === 0;
+        return count($path) === 0;
     }
 
     /** Organiza um array de rotas preparando para a interpretação */
@@ -259,11 +260,11 @@ abstract class Router
     }
 
     /** Define os parametros da rota dentro do objeto de requisição */
-    protected static function setRequestRouteParams(?string $template, ?array $params): void
+    protected static function setRequestRouteParams(Request $request, ?string $template, ?array $params): void
     {
         if (is_null($template)) return;
 
-        $uri = Request::path();
+        $uri = $request->path();
         $dataParams = [];
 
         foreach ($params ?? [] as $pos => $name) {
@@ -278,37 +279,15 @@ abstract class Router
         }
 
         foreach ($dataParams as $var => $value)
-            Request::set_route($var, $value);
+            $request->set_route($var, $value);
     }
 
     /** Executa uma resposta de rota */
-    protected static function executeActionResponse(string|array|int $response, array $data = [])
+    protected static function executeActionResponse(string|array|int $response, Request $contextRequest, Response $contextResponse)
     {
         $response = is_array($response) ? $response : [$response];
-
         $action = array_shift($response) ?? STS_NOT_FOUND;
-
-        if ($action == STS_REDIRECT) {
-            $url = array_shift($response) ?? env("STM_303") ?? 'unknown';
-
-            $prepare = [];
-
-            foreach (Prepare::tags($url) as $tag) {
-                if (!isset($data[$tag]))
-                    throw new Exception("Parameter [$tag] is required", STS_INTERNAL_SERVER_ERROR);
-                $prepare[$tag] = $data[$tag];
-                unset($data[$tag]);
-            }
-
-            $url = prepare($url, [...$prepare, $data]);
-
-            if (str_ends_with($url, '...')) {
-                $url = str_ends_with($url, '/...') ? substr($url, 0, -4) : substr($url, 0, -3);
-                $url .= '/' . implode('/', array_values($data));
-            }
-
-            return redirect($url, Request::query());
-        }
+        $data = $contextRequest->data();
 
         if (is_httpStatus($action)) {
             $status = $action;
@@ -333,14 +312,17 @@ abstract class Router
             if (method_exists($class, '__construct'))
                 $__constructParams = self::getMethodParams($class, '__construct', $data);
 
-            $response = new $class(...$__constructParams);
+            $controller = new $class(...$__constructParams);
 
-            if (!method_exists($response, $method))
+            if (is_extend($controller, Context::class)) {
+                $controller->request = $contextRequest;
+                $controller->response = $contextResponse;
+            }
+
+            if (!method_exists($controller, $method))
                 throw new Exception("Method [$method] does not exist in response class", STS_NOT_IMPLEMENTED);
 
-            $response = $response->{$method}(...self::getMethodParams($class, $method, $data));
-
-            return $response;
+            return $controller->{$method}(...self::getMethodParams($class, $method, $data));
         }
 
         throw new Exception('response route error', STS_INTERNAL_SERVER_ERROR);

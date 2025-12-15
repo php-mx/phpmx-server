@@ -10,7 +10,6 @@ use PhpMx\Input\InputFieldList;
 use PhpMx\Input\InputFieldScheme;
 use PhpMx\Input\InputFieldUpload;
 use PhpMx\Input\InputFieldUploadImage;
-use PhpMx\Request;
 
 /** Classe para gerenciamento de campos e validação de inputs da requisição. */
 class Input
@@ -20,9 +19,8 @@ class Input
     /** @var InputField[] */
     protected array $dataField = [];
 
-    function __construct(?array $dataValue = null)
+    function __construct(array $dataValue = [])
     {
-        $dataValue = $dataValue ?? Request::data();
         $this->dataValue = array_map(fn($var) => str_get_var($var), $dataValue);
     }
 
