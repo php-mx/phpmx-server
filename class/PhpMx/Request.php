@@ -19,7 +19,7 @@ class Request
     /** Retorna um ou todos os parametros server da requisição atual */
     function server(): mixed
     {
-        $this->SERVER = $this->SERVER ?? $this->current_type();
+        $this->SERVER = $this->SERVER ?? $this->current_server();
 
         if (func_num_args()) return $this->SERVER[func_get_arg(0)] ?? null;
 
@@ -166,15 +166,9 @@ class Request
 
     protected function current_type(): string
     {
-        return match (true) {
-            IS_TERMINAL => 'TERMINAL',
-            IS_GET => 'GET',
-            IS_POST => 'POST',
-            IS_PUT => 'PUT',
-            IS_DELETE => 'DELETE',
-            IS_OPTIONS => 'OPTIONS',
-            default => 'UNDEFINED',
-        };
+        if (IS_TERMINAL) return 'TERMINAL';
+
+        return $this->server('REQUEST_METHOD') ?? 'UNDEFINED';
     }
 
     protected function current_ssl(): bool
@@ -232,9 +226,9 @@ class Request
 
         if (is_json($inputData)) {
             $data = json_decode($inputData, true);
-        } elseif (IS_POST) {
+        } elseif ($this->type('POST')) {
             $data = $_POST;
-        } elseif (IS_GET || IS_PUT || IS_DELETE) {
+        } else if ($this->type('GET') || $this->type('PUT') || $this->type('DELETE')) {
             parse_str($inputData, $data);
         }
 
