@@ -5,7 +5,7 @@ namespace PhpMx;
 use Closure;
 use Exception;
 
-$interceptor = new class extends Terminal {
+$interceptor = new class {
 
     public bool $intercepting = false;
 
@@ -26,16 +26,16 @@ $interceptor = new class extends Terminal {
         if (!is_null($uri))
             $routes = array_filter($routes, fn($v) => $this->checkRouteMatch($v['template'], $uri));
 
-        self::echo();
+        Terminal::echo();
 
         foreach ($routes as $route) {
-            self::echo(' [[#method]]: [#call]', $route);
-            self::echo('   response: [#]', $route['response']);
-            self::echo('   middlewares: [#]', $route['middlewares']);
-            self::echo('   registred: [#]', $route['registred_in']);
+            Terminal::echo(' [[#method]]: [#call]', $route);
+            Terminal::echo('   response: [#]', $route['response']);
+            Terminal::echo('   middlewares: [#]', $route['middlewares']);
+            Terminal::echo('   registred: [#]', $route['registred_in']);
             if ($route['replaced_in'])
-                self::echo('   replaced: [#]', $route['replaced_in']);
-            self::echo();
+                Terminal::echo('   replaced: [#]', $route['replaced_in']);
+            Terminal::echo();
         }
     }
 
@@ -138,7 +138,7 @@ $interceptor->intercepting = !class_exists('\PhpMx\Router', false);
 if ($interceptor->intercepting) {
 
     Log::add('mx', 'interceptor [PhpMx.Router]');
-    abstract class Router
+    class Router
     {
         protected static array $ROUTE = [];
         protected static array $MIDDLEWARES = [[]];

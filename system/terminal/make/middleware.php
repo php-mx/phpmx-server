@@ -5,7 +5,7 @@ use PhpMx\Import;
 use PhpMx\Path;
 use PhpMx\Terminal;
 
-return new class extends Terminal {
+return new class {
 
     function __invoke($middleware)
     {
@@ -23,7 +23,7 @@ return new class extends Terminal {
 
         File::create($file, $template);
 
-        self::echo('middleware [[#]] created successfully', $middleware);
-        self::echo('[[#]]', $file);
+        Terminal::echo('middleware [[#]] created successfully', $middleware);
+        Terminal::echo('[[#]]', $file);
     }
 };

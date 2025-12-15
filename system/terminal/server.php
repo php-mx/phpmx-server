@@ -3,7 +3,7 @@
 use PhpMx\File;
 use PhpMx\Terminal;
 
-return new class extends Terminal {
+return new class {
 
     function __invoke()
     {
@@ -13,12 +13,12 @@ return new class extends Terminal {
         $port = parse_url(env('TERMINAL_URL'))['port'];
         $port = $port ? ":$port" : '';
 
-        self::echoLine();
-        self::echo('| Starting PHP server');
-        self::echo('| Visit [[#]]', env('TERMINAL_URL'));
-        self::echo('| Use [[#]] to terminate the server', "CTRL + C");
-        self::echoLine();
-        self::echo('');
+        Terminal::echoLine();
+        Terminal::echo('| Starting PHP server');
+        Terminal::echo('| Visit [[#]]', env('TERMINAL_URL'));
+        Terminal::echo('| Use [[#]] to terminate the server', "CTRL + C");
+        Terminal::echoLine();
+        Terminal::echo('');
 
         echo shell_exec("php -S 0.0.0.0$port index.php");
     }

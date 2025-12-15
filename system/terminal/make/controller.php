@@ -5,7 +5,7 @@ use PhpMx\Import;
 use PhpMx\Path;
 use PhpMx\Terminal;
 
-return new class extends Terminal {
+return new class {
 
     function __invoke($controller)
     {
@@ -29,7 +29,7 @@ return new class extends Terminal {
 
         File::create($file, $template);
 
-        self::echo("Controller [$file] created successfully");
-        self::echo('[[#]]', $file);
+        Terminal::echo("Controller [$file] created successfully");
+        Terminal::echo('[[#]]', $file);
     }
 };

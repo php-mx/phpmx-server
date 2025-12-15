@@ -4,25 +4,25 @@ use PhpMx\Dir;
 use PhpMx\Path;
 use PhpMx\Terminal;
 
-return new class extends Terminal {
+return new class {
 
     protected $used = [];
 
     function __invoke()
     {
-        self::echo();
+        Terminal::echo();
 
         foreach (Path::seekForDirs('system/middleware') as $path) {
             $origin = $this->getOrigim($path);
 
-            self::echo('[[#]]', $origin);
-            self::echoLine();
+            Terminal::echo('[[#]]', $origin);
+            Terminal::echoLine();
 
             foreach ($this->getFilesIn($path, $origin) as $file) {
-                self::echo(' - [#ref] ([#file])[#status]', $file);
+                Terminal::echo(' - [#ref] ([#file])[#status]', $file);
             };
 
-            self::echo();
+            Terminal::echo();
         }
     }
 
