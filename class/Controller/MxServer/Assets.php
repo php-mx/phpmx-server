@@ -2,14 +2,14 @@
 
 namespace Controller\MxServer;
 
+use PhpMx\Context;
 use PhpMx\Path;
-use PhpMx\Request;
 
-class Assets
+class Assets extends Context
 {
     function __invoke()
     {
-        $file = Path::seekForFile('library/assets', ...Request::route());
-        \PhpMx\Assets::send($file);
+        $file = Path::seekForFile('library/assets', ...$this->request->route());
+        \PhpMx\Assets::send($this->response, $file);
     }
 }

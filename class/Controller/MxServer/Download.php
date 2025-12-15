@@ -2,15 +2,14 @@
 
 namespace Controller\MxServer;
 
-use PhpMx\Assets;
+use PhpMx\Context;
 use PhpMx\Path;
-use PhpMx\Request;
 
-class Download
+class Download extends Context
 {
     function __invoke()
     {
-        $file = Path::seekForFile('library/download', ...Request::route());
-        Assets::download($file);
+        $file = Path::seekForFile('library/download', ...$this->request->route());
+        \PhpMx\Assets::download($this->response, $file);
     }
 }
