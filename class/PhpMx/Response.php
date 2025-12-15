@@ -2,36 +2,36 @@
 
 namespace PhpMx;
 
-/** Classe utilitária para construção e envio de respostas HTTP. */
-abstract class Response
+/** Classe para construção e envio de respostas HTTP. */
+class Response
 {
-    protected static array $HEADER = [];
-    protected static ?int $STATUS = null;
-    protected static ?string $TYPE = null;
-    protected static mixed $CONTENT = null;
-    protected static ?string $CACHE = null;
-    protected static bool $DOWNLOAD = false;
-    protected static ?string $DOWNLOAD_NAME = null;
+    protected array $HEADER = [];
+    protected ?int $STATUS = null;
+    protected ?string $TYPE = null;
+    protected mixed $CONTENT = null;
+    protected ?string $CACHE = null;
+    protected bool $DOWNLOAD = false;
+    protected ?string $DOWNLOAD_NAME = null;
 
     /** Define o status HTTP da resposta */
-    static function status(?int $status, bool $replace = true)
+    function status(?int $status, bool $replace = true)
     {
-        self::$STATUS = $replace ? $status : (self::$STATUS ?? $status);
+        $this->STATUS = $replace ? $status : ($this->STATUS ?? $status);
     }
 
     /** Define um cabeçalho para a resposta */
-    static function header(string|array $name, ?string $value = null)
+    function header(string|array $name, ?string $value = null)
     {
         if (is_array($name)) {
             foreach ($name as $n => $v)
-                self::header($n, $v);
+                $this->header($n, $v);
         } else {
-            self::$HEADER[$name] = $value;
+            $this->HEADER[$name] = $value;
         }
     }
 
     /** Define o contentType da resposta */
-    static function type(?string $type, bool $replace = true)
+    function type(?string $type, bool $replace = true)
     {
         if ($type) {
             $type = trim($type, '.');
@@ -39,41 +39,41 @@ abstract class Response
             $type = Mime::getMimeEx($type) ?? $type;
         }
 
-        if ($replace || is_null(self::$TYPE))
-            self::$TYPE = $type;
+        if ($replace || is_null($this->TYPE))
+            $this->TYPE = $type;
     }
 
     /** Define o conteúdo da resposta */
-    static function content(mixed $content, bool $replace = true)
+    function content(mixed $content, bool $replace = true)
     {
-        if ($replace || is_null(self::$CONTENT))
-            self::$CONTENT = $content;
+        if ($replace || is_null($this->CONTENT))
+            $this->CONTENT = $content;
     }
 
     /** Define se o arquivo deve ser armazenado em cache */
-    static function cache(null|bool|string $strToTime): void
+    function cache(null|bool|string $strToTime): void
     {
         if (is_bool($strToTime)) $strToTime = $strToTime ? null : '';
-        self::$CACHE = $strToTime;
+        $this->CACHE = $strToTime;
     }
 
     /** Define se o navegador deve fazer download da resposta */
-    static function download(null|bool|string $download): void
+    function download(null|bool|string $download): void
     {
         if (is_string($download)) {
-            self::$DOWNLOAD_NAME = $download;
+            $this->DOWNLOAD_NAME = $download;
             $download = true;
         }
-        self::$DOWNLOAD = boolval($download);
+        $this->DOWNLOAD = boolval($download);
     }
 
     /** Envia a resposta ao navegador do cliente */
-    static function send(): never
+    function send(): never
     {
-        $content = self::getMontedContent();
-        $headers = self::getMontedHeders();
+        $content = $this->getMontedContent();
+        $headers = $this->getMontedHeders();
 
-        http_response_code(self::$STATUS ?? STS_OK);
+        http_response_code($this->STATUS ?? STS_OK);
 
         foreach ($headers as $name => $value)
             header(remove_accents("$name: $value"));
@@ -82,64 +82,64 @@ abstract class Response
     }
 
     /** Retorna o status atual da resposta */
-    static function getStatus(): ?int
+    function getStatus(): ?int
     {
-        return is_httpStatus(self::$STATUS) ? self::$STATUS : null;
+        return is_httpStatus($this->STATUS) ? $this->STATUS : null;
     }
 
     /** Retorna o conteúdo atual da resposta */
-    static function getContent(): mixed
+    function getContent(): mixed
     {
-        return self::$CONTENT;
+        return $this->CONTENT;
     }
 
     /** Verifica se o tipo da resposta é um dos tipos informados */
-    static function checkType(): bool
+    function checkType(): bool
     {
         foreach (func_get_args() as $type)
-            if (Mime::checkMimeMime($type, self::$TYPE))
+            if (Mime::checkMimeMime($type, $this->TYPE))
                 return true;
         return false;
     }
 
     /** Retorna conteúdo da resposta */
-    protected static function getMontedContent(): string
+    protected function getMontedContent(): string
     {
-        return is_array(self::$CONTENT) ? json_encode(self::$CONTENT) : strval(self::$CONTENT);
+        return is_array($this->CONTENT) ? json_encode($this->CONTENT) : strval($this->CONTENT);
     }
 
     /** Retorna cabeçalhos de resposta */
-    protected static function getMontedHeders(): array
+    protected function getMontedHeders(): array
     {
         return [
-            ...self::$HEADER,
-            ...self::getMontedHeaderCache(),
-            ...self::getMontedHeaderType(),
-            ...self::getMontedHeaderDownload(),
-            ...self::getMontedHeader(),
+            ...$this->HEADER,
+            ...$this->getMontedHeaderCache(),
+            ...$this->getMontedHeaderType(),
+            ...$this->getMontedHeaderDownload(),
+            ...$this->getMontedHeader(),
         ];
     }
 
     /** Retorna os cabeçalhos */
-    protected static function getMontedHeader(): array
+    protected function getMontedHeader(): array
     {
         return [
             'MX' => 'true',
-            'MX-Status' => self::$STATUS ?? STS_OK,
-            'MX-Type' => Mime::getExMime(self::$TYPE),
+            'MX-Status' => $this->STATUS ?? STS_OK,
+            'MX-Type' => Mime::getExMime($this->TYPE),
         ];
     }
 
     /** Retorna cabeçalhos de cache */
-    protected static function getMontedHeaderCache(): array
+    protected function getMontedHeaderCache(): array
     {
-        if (!self::$TYPE) self::type(is_json(self::$CONTENT) ? 'json' : 'html');
+        if (!$this->TYPE) $this->type(is_json($this->CONTENT) ? 'json' : 'html');
 
         $headerCache = [];
 
-        $cacheType = Mime::getExMime(self::$TYPE);
+        $cacheType = Mime::getExMime($this->TYPE);
 
-        $cacheTime = self::$CACHE;
+        $cacheTime = $this->CACHE;
 
         if (is_bool($cacheTime)) $cacheTime = $cacheTime ? null : '';
 
@@ -169,23 +169,23 @@ abstract class Response
     }
 
     /** Retorna cabeçalhos de tipo de conteúdo */
-    protected static function getMontedHeaderType(): array
+    protected function getMontedHeaderType(): array
     {
-        if (is_array(self::$CONTENT) || is_json(self::$CONTENT))
-            self::type('json');
+        if (is_array($this->CONTENT) || is_json($this->CONTENT))
+            $this->type('json');
 
-        $type = self::$TYPE ?? Mime::getMimeEx('json');
+        $type = $this->TYPE ?? Mime::getMimeEx('json');
 
         return ['Content-Type' => "$type; charset=utf-8"];
     }
 
     /** Retorna cabeçalhos de download */
-    protected static function getMontedHeaderDownload(): array
+    protected function getMontedHeaderDownload(): array
     {
         $headerDownload = [];
-        if (self::$DOWNLOAD) {
-            $ex = Mime::getExMime(self::$TYPE) ?? 'download';
-            $fileName = self::$DOWNLOAD_NAME ?? 'download';
+        if ($this->DOWNLOAD) {
+            $ex = Mime::getExMime($this->TYPE) ?? 'download';
+            $fileName = $this->DOWNLOAD_NAME ?? 'download';
             $fileName = File::setEx($fileName, $ex);
             $headerDownload['Content-Disposition'] = "attachment; filename=$fileName";
         }
