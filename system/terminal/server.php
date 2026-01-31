@@ -11,7 +11,7 @@ return new class {
         if (!File::check('index.php'))
             throw new Exception('[index.php] not found');
 
-        $url = parse_url(env('TERMINAL_URL', 'http://localhost:8888'));
+        $url = parse_url(env('TERMINAL_URL') ?? 'http://localhost:8888');
 
         $scheme = $url['scheme'] ?? 'http';
         $host = $url['host'] ?? 'localhost';

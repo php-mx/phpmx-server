@@ -183,7 +183,7 @@ class Request
     {
         if ($this->server('HTTP_HOST')) return $this->server('HTTP_HOST');
 
-        $parse = parse_url(env('TERMINAL_URL', 'http://localhost:8888'));
+        $parse = parse_url(env('TERMINAL_URL') ?? 'http://localhost:8888');
 
         $host = $parse['host'];
 
