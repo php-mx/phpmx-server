@@ -23,7 +23,9 @@ return new class {
 
         File::create($file, $template);
 
-        Terminal::echo('middleware [[#]] created successfully', $middleware);
-        Terminal::echo('[[#]]', $file);
+        Terminal::echo('middleware [#greenB:#] created successfully [#whiteD:#]', [
+            $middleware,
+            $file
+        ]);
     }
 };

@@ -26,16 +26,20 @@ $interceptor = new class {
         if (!is_null($uri))
             $routes = array_filter($routes, fn($v) => $this->checkRouteMatch($v['template'], $uri));
 
-        Terminal::echo();
+        foreach ($routes as $n => $route) {
 
-        foreach ($routes as $route) {
-            Terminal::echo(' [[#method]]: [#call]', $route);
-            Terminal::echo('   response: [#]', $route['response']);
-            Terminal::echo('   middlewares: [#]', $route['middlewares']);
-            Terminal::echo('   registred: [#]', $route['registred_in']);
+            if ($n > 0) Terminal::echo();
+
+            $color = ['GET' => 'green', 'POST' => 'blue', 'PUT' => 'magenta', 'DELETE' => 'red'][$route['method']];
+            $D = 'D';
+
+            Terminal::echo("[#$color$D:#method] [#$color:#call]", $route);
+            Terminal::echo(" [#$color$D:response] [#]", $route['response']);
+            if (!empty($route['middlewares']))
+                Terminal::echo("  middlewares: [#]", $route['middlewares']);
+            Terminal::echo(" [#$color$D:registred] [#]", $route['registred_in']);
             if ($route['replaced_in'])
-                Terminal::echo('   replaced: [#]', $route['replaced_in']);
-            Terminal::echo();
+                Terminal::echo(" [#$color$D:replaced] [#]", $route['replaced_in']);
         }
     }
 
@@ -93,7 +97,7 @@ $interceptor = new class {
                 'call' => "/$call",
                 'response' => $response,
                 'middlewares' => $middlewares,
-                'registred_in' => "$file ($line)",
+                'registred_in' => "$file:$line",
                 'replaced_in' => $used[$key] ?? null,
             ];
 
@@ -110,7 +114,7 @@ $interceptor = new class {
 
     protected function getOrigim($path)
     {
-        if ($path === 'system/router') return 'CURRENT-PROJECT';
+        if ($path === 'system/router') return 'current-project';
 
         if (str_starts_with($path, 'vendor/')) {
             $parts = explode('/', $path);
@@ -122,14 +126,14 @@ $interceptor = new class {
 
     protected function getResponse($response)
     {
-        if (is_numeric($response)) return "[$response]";
+        if (is_numeric($response)) return "$response";
 
-        $response = is_array($response) ? $response : [$response, '__invoke'];
+        $response = is_array($response) ? $response : [$response, ':__invoke'];
 
         $class = array_shift($response);
         $method = array_shift($response);
 
-        return prepare("[$class][$method]");
+        return prepare("$class$method");
     }
 };
 

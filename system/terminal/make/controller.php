@@ -29,7 +29,9 @@ return new class {
 
         File::create($file, $template);
 
-        Terminal::echo("Controller [$file] created successfully");
-        Terminal::echo('[[#]]', $file);
+        Terminal::echo("Controller [#greenB:#] created successfully [#whiteD:#]", [
+            $class,
+            $file
+        ]);
     }
 };
