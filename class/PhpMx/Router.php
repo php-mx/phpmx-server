@@ -55,6 +55,7 @@ class Router
         Log::add('mx', 'route matching not found');
         return null;
     }
+
     /** Verifica se um template combina com a URL atual */
     protected function checkRouteMatch(array $path, string $template): bool
     {
