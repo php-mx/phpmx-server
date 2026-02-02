@@ -14,9 +14,6 @@
       "": "class/"
     },
     "files": [
-      "system/helper/constant/http_status.php",
-      "system/helper/function/is.php",
-      "system/helper/script/env.php",
       "system/helper/script/path.php"
     ]
   },

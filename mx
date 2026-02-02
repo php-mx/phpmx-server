@@ -1,0 +1,13 @@
+<?php
+
+chdir(__DIR__);
+
+require_once "./vendor/autoload.php";
+
+echo "\n";
+
+$terminalArgs = $argv;
+array_shift($terminalArgs);
+\PhpMx\Terminal::run(...$terminalArgs);
+
+echo "\n";

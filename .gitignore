@@ -1,8 +1,8 @@
-/mx
 /.conf
 /composer.lock
 
-# MX CORE
+# MX
+
 /.env
 /vendor
 /library/cache
