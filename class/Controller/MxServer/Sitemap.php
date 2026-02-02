@@ -2,6 +2,9 @@
 
 namespace Controller\MxServer;
 
+use PhpMx\Assets;
+use PhpMx\File;
+use PhpMx\Path;
 use PhpMx\Response;
 
 class Sitemap
@@ -9,8 +12,13 @@ class Sitemap
     /** Gera a estrutura inicial do mapa do site para indexação em motores de busca */
     function __invoke()
     {
-        Response::type('xml');
-        Response::content('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></urlset>');
-        Response::send();
+        $file = path('library/assets/sitemap.xml');
+
+        if (!File::check($file)) {
+            Response::cache(false);
+            $file = Path::seekForFile('library/assets/sitemap.xml');
+        }
+
+        Assets::send($file);
     }
 }

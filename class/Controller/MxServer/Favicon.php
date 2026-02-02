@@ -18,6 +18,7 @@ class Favicon
             Response::cache(false);
             $file = Path::seekForFile('library/assets/favicon.ico');
         }
+
         Assets::send($file);
     }
 }
