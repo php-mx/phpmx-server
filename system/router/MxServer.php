@@ -12,4 +12,3 @@ Router::get('sitemap.xml', \Controller\MxServer\Sitemap::class);
 Router::get('captcha', \Controller\MxServer\Captcha::class);
 
 Router::get('', STS_OK);
-Router::get('', STS_OK);
