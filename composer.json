@@ -1,26 +1,29 @@
 {
-  "name": "phpmx/server",
-  "description": "Camada para criação de APIs com PHPMX",
-  "license": "MIT",
-  "minimum-stability": "dev",
-  "authors": [
-    {
-      "name": "André Ricardo",
-      "email": "contatoadmx@gmail.com"
-    }
-  ],
-  "autoload": {
-    "psr-4": {
-      "": "class/"
+    "name": "phpmx/server",
+    "description": "Camada para criação de APIs com PHPMX",
+    "license": "MIT",
+    "minimum-stability": "dev",
+    "authors": [
+        {
+            "name": "André Ricardo",
+            "email": "contatoadmx@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "": "class/"
+        },
+        "files": [
+            "system/helper/constant/http_status.php",
+            "system/helper/function/is.php",
+            "system/helper/script/env.php",
+            "system/helper/script/path.php"
+        ]
     },
-    "files": [
-      "system/helper/script/path.php"
-    ]
-  },
-  "suggest": {
-    "ext-gd": "Required if you intend to use Captcha input."
-  },
-  "require": {
-    "phpmx/core": "dev-main"
-  }
+    "suggest": {
+        "ext-gd": "Required if you intend to use Captcha input."
+    },
+    "require": {
+        "phpmx/core": "dev-main"
+    }
 }

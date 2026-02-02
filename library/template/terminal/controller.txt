@@ -1,0 +1,14 @@
+<?php
+
+namespace [#namespace];
+
+/** */
+class [#class]
+{
+    /** */
+    function __invoke()
+    {
+        return STS_NOT_IMPLEMENTED;
+    }
+}
+
