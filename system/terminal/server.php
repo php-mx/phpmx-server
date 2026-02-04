@@ -23,10 +23,10 @@ return new class {
 
         Env::default('TERMINAL_URL', $url);
 
-        Terminal::echo('Starting PHP server');
-        Terminal::echo('Visit [#cyanB:#]', $url);
-        Terminal::echo('Use [#blue:#] to terminate the server', "CTRL+C");
-        Terminal::echo();
+        Terminal::echol('Starting PHP server');
+        Terminal::echol('Visit [#c:p,#]', $url);
+        Terminal::echol('Use [#c:s,#] to terminate the server', "CTRL+C");
+        Terminal::echol();
 
         echo shell_exec("php -S 0.0.0.0$port index.php");
     }

@@ -24,8 +24,6 @@ return new class {
 
         File::create($file, $template);
 
-
-        Terminal::echo("Middleware [#cyan:#] created successfully", [$middleware]);
-        Terminal::echo(" [#blue:#]", [$file]);
+        Terminal::echol("File [#c:p,#] created successfully", $file);
     }
 };

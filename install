@@ -1,9 +1,10 @@
 <?php
 
-use PhpMx\TerminalInstall;
-use PhpMx\Terminal;
+use PhpMx\Trait\TerminalInstallTrait;
 
-return new class extends TerminalInstall {
+return new class {
+
+    use TerminalInstallTrait;
 
     function __invoke()
     {

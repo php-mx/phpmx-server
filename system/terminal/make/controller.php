@@ -3,6 +3,7 @@
 use PhpMx\File;
 use PhpMx\Import;
 use PhpMx\Path;
+use PhpMx\Router;
 use PhpMx\Terminal;
 
 /** Gera um novo arquivo de Controller com namespace e estrutura baseados no caminho informado */
@@ -30,7 +31,6 @@ return new class {
 
         File::create($file, $template);
 
-        Terminal::echo("Controller [#cyan:#] created successfully", [$class]);
-        Terminal::echo(" [#blue:#]", [$file]);
+        Terminal::echol("File [#c:p,#] created successfully", $file);
     }
 };
