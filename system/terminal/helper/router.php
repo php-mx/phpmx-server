@@ -17,7 +17,8 @@ return new class extends Router {
     function __invoke($match = null, $method = null)
     {
         $registredRoutes = [];
-        $method = is_null($method) == '*' ? null : strtoupper($method);
+        $method = is_null($method) ? null : strtoupper($method);
+        $useFilter = !is_blank($match) && $match != '*';
 
         foreach (Path::seekForDirs('system/router') as $path)
             foreach (array_reverse(Dir::seekForFile($path, true)) as $file) {
@@ -34,7 +35,7 @@ return new class extends Router {
                                 'order' => $template,
                                 'template' => '/' . trim($template, '/'),
                                 'response' => $response,
-                                'middlewares' => empty($middlewares) ? '' : ' [' . implode(', ', $middlewares) . ']',
+                                'middlewares' => empty($middlewares) ? '' : '[' . implode(', ', $middlewares) . '] ',
                                 'description' => $description,
                                 'origim' => $origim,
                                 'file' => path($path, $file),
@@ -43,12 +44,16 @@ return new class extends Router {
                             ];
                             $this->key[$currentMethod][$template] = true;
 
-                            if (!is_null($match)) {
-                                $searchMatch = strtolower('/' . trim($match, '/'));
-                                $searchTemplate = strtolower('/' . trim($template, '/'));
-                                if (!str_starts_with($searchTemplate, $searchMatch) && !$this->checkRouteMatch([$match], $template))
+
+                            if ($useFilter) {
+
+                                if ($match == '/' && $template != '/')
+                                    continue;
+
+                                if (!str_starts_with(trim($template, '/'), trim($match, '/')) && !$this->checkRouteMatch([$match], $template))
                                     continue;
                             }
+
                             $registredRoutes[$origim][$currentMethod][] = $curentRoute;
                         }
 
@@ -72,20 +77,24 @@ return new class extends Router {
                 if (empty($routes)) continue;
                 $routes = $this->organize($routes);
 
-                Terminal::echol();
 
-                foreach ($routes as $route) {
+                foreach (array_reverse($routes) as $route) {
+                    Terminal::echol();
                     if (!$route['replaced']) {
                         $response = $route['response'];
 
-                        Terminal::echo(" - [#c:s,$curentMethod][#c:s,:][#c:p,#template]", $route);
-                        Terminal::echol("[#middlewares] $response ", $route);
+                        Terminal::echol(" - [#c:s,$curentMethod][#c:s,:][#c:p,#template] [#middlewares]$response", $route);
+                        if ($route['description'])
+                            Terminal::echol("    [#c:dd,#description]", $route);
                     } else {
                         Terminal::echol(" - [#c:sd,$curentMethod][#c:sd,:][#c:pd,#template] [#c:wd,replaced]", $route);
                     }
                 }
             }
         }
+
+        if ($originsLn == -1)
+            Terminal::echol('[#c:dd, - No routes found - ]');
     }
 
     protected function origin($path, $base)
@@ -102,24 +111,28 @@ return new class extends Router {
 
     protected static function organize(array $array): array
     {
-        uasort($array, function ($a, $b) {
-            $pathA = $a['order'] ?? '';
-            $pathB = $b['order'] ?? '';
+        uasort($array, function ($itemA, $itemB) {
+            $a = $itemA['order'];
+            $b = $itemB['order'];
 
-            $countA = substr_count($pathA, '/');
-            $countB = substr_count($pathB, '/');
+            $countA = substr_count($a, '/');
+            $countB = substr_count($b, '/');
 
-            if ($countA !== $countB) {
-                return $countB <=> $countA;
-            }
+            if ($countA !== $countB) return $countB <=> $countA;
 
-            $aParts = explode('/', $pathA);
-            $bParts = explode('/', $pathB);
+            $posA = strpos($a, '/');
+            $posB = strpos($b, '/');
+
+            if ($posA !== $posB) return $posB <=> $posA;
+
+            $aParts = explode('/', $a);
+            $bParts = explode('/', $b);
+
             $max = max(count($aParts), count($bParts));
 
             $peso = fn($part) => match ($part) {
-                '...'   => 2,
-                '#'     => 1,
+                '...' => 2,
+                '#' => 1,
                 default => 0,
             };
 
@@ -130,12 +143,10 @@ return new class extends Router {
                 $pesoA = $peso($partA);
                 $pesoB = $peso($partB);
 
-                if ($pesoA !== $pesoB) {
-                    return $pesoA <=> $pesoB;
-                }
+                if ($pesoA !== $pesoB) return $pesoA <=> $pesoB;
             }
 
-            return $pathA <=> $pathB;
+            return 0;
         });
 
         return $array;
