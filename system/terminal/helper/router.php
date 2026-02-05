@@ -77,15 +77,14 @@ return new class extends Router {
                 if (empty($routes)) continue;
                 $routes = $this->organize($routes);
 
+                Terminal::echol();
 
                 foreach (array_reverse($routes) as $route) {
-                    Terminal::echol();
                     if (!$route['replaced']) {
                         $response = $route['response'];
 
-                        Terminal::echol(" - [#c:s,$curentMethod][#c:s,:][#c:p,#template] [#middlewares]$response", $route);
-                        if ($route['description'])
-                            Terminal::echol("    [#c:dd,#description]", $route);
+                        Terminal::echol(" - [#c:d,$curentMethod][#c:dd,:][#c:p,#template] [#description]", $route);
+                        Terminal::echol("     [#c:dd,response][#c:dd,:] [#middlewares]$response", $route);
                     } else {
                         Terminal::echol(" - [#c:sd,$curentMethod][#c:sd,:][#c:pd,#template] [#c:wd,replaced]", $route);
                     }
@@ -178,7 +177,7 @@ return new class extends Router {
     protected function getResponseInfo($response): array
     {
         if (is_int($response))
-            return ["[#c:w,$response]", ''];
+            return ["[#c:wd,$response]", ''];
 
         $parts = is_array($response) ? $response : [$response];
         $controller = array_shift($parts);
@@ -186,6 +185,14 @@ return new class extends Router {
 
         if (class_exists($controller)) {
             if (method_exists($controller, $method)) {
+
+                $reflection = new \ReflectionMethod($controller, $method);
+                $filePath = path($reflection->getFileName());
+                $startLine = $reflection->getStartLine();
+                $doc = $reflection->getDocComment();
+                $doc = $doc ? trim(str_replace(['/**', '*/', '*', "\r"], '', $doc)) : '';
+
+                return ["[#c:sd,{$filePath}:{$startLine} {$method}()]", $doc];
             } else {
 
                 $reflection = new \ReflectionClass($controller);
@@ -196,17 +203,5 @@ return new class extends Router {
         } else {
             return ["[#c:e,$controller]", ''];
         }
-
-        if (class_exists($controller) && method_exists($controller, $method)) {
-            $reflection = new \ReflectionMethod($controller, $method);
-            $filePath = path($reflection->getFileName());
-            $startLine = $reflection->getStartLine();
-            $doc = $reflection->getDocComment();
-            $doc = $doc ? trim(str_replace(['/**', '*/', '*', "\r"], '', $doc)) : '';
-
-            return ["[#c:sd,{$filePath}:{$startLine} {$method}()]", $doc];
-        }
-
-        return ["[#c:e,$controller ({$method})]", ''];
     }
 };
