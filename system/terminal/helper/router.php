@@ -86,7 +86,7 @@ return new class extends Router {
                         Terminal::echol(" - [#c:d,$curentMethod][#c:dd,:][#c:p,#template] [#description]", $route);
                         Terminal::echol("     [#c:dd,response][#c:dd,:] [#middlewares]$response", $route);
                     } else {
-                        Terminal::echol(" - [#c:sd,$curentMethod][#c:sd,:][#c:pd,#template] [#c:wd,replaced]", $route);
+                        Terminal::echol(" - [#c:dd,$curentMethod][#c:sd,:][#c:pd,#template] [#c:wd,replaced]", $route);
                     }
                 }
             }
