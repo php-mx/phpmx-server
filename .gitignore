@@ -1,10 +1,15 @@
 /.conf
 /composer.lock
 
-# MX CORE
+/class/Controller/*
+!/class/Controller/MxServer
+
+/system/router/*
+
+# MX-CORE
 
 /.env
 /vendor
+/.vscode
 /library/cache
-/library/certificate/*
-!/library/certificate/base.crt
+/library/certificate

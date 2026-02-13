@@ -19,8 +19,10 @@ class Input
     /** @var InputField[] */
     protected array $dataField = [];
 
-    function __construct(array $dataValue = [])
+    function __construct(?array $dataValue = null)
     {
+        $dataValue = $dataValue ?? Request::data();
+
         $this->dataValue = array_map(fn($var) => str_get_var($var), $dataValue);
     }
 
@@ -62,9 +64,7 @@ class Input
     /** Retorna o objeto de um campo de input preparado para receber um codigo Captcha */
     function &fieldCaptcha($name, $alias = null, mixed $default = null): InputFieldCaptcha
     {
-        if (!extension_loaded('gd'))
-            throw new Exception("Extension [gd] is required to use Captcha.", STS_INTERNAL_SERVER_ERROR);
-
+        phpex('gd');
         $this->dataField[$name] = $this->dataField[$name] ?? new InputFieldCaptcha($name, $alias, $this->dataValue[$name] ?? $default);
         return $this->dataField[$name];
     }

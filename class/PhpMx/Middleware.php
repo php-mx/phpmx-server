@@ -6,20 +6,18 @@ use Closure;
 use Exception;
 
 /** Classe responsável pela execução encadeada de middlewares. */
-class MiddlewareQueue
+abstract class Middleware
 {
     protected array $QUEUE = [];
 
-    function __construct() {}
-
     /** Executa uma fila de middlewares retornando a action */
-    function __invoke(array $queue, Closure $action)
+    static function run(array $queue, Closure $action)
     {
         $queue[] = $action;
         return self::execute($queue);
     }
 
-    protected function execute(mixed &$queue): mixed
+    protected static function execute(mixed &$queue): mixed
     {
         if (count($queue)) {
             $middleware = array_shift($queue);
@@ -31,7 +29,7 @@ class MiddlewareQueue
         return null;
     }
 
-    protected function getCallable(mixed $middleware)
+    protected static function getCallable(mixed $middleware)
     {
         if (is_array($middleware))
             return fn($next) => $this([...$middleware], $next);

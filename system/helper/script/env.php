@@ -1,5 +1,6 @@
 <?php
 
+
 use PhpMx\Env;
 
 /** Obriga o redirecionamento de todas as requisições para HTTPS */

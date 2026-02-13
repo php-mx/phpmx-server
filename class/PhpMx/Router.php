@@ -104,8 +104,7 @@ abstract class Router
         Log::add('mx', 'route dispatch', function () use ($middlewares, $wrapper, $GLOBAL_MIDDLEWARES) {
             $wrapper = fn() => Log::add('mx', 'route action', $wrapper);
 
-            $middlewareQueue = new MiddlewareQueue();
-            $response = $middlewareQueue([...$GLOBAL_MIDDLEWARES, ...$middlewares], $wrapper);
+            $response = Middleware::run([...$GLOBAL_MIDDLEWARES, ...$middlewares], $wrapper);
 
             Response::content($response);
             Response::send();

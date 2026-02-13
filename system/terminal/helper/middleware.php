@@ -1,9 +1,8 @@
 <?php
 
 use PhpMx\Dir;
-use PhpMx\Path;
+use PhpMx\ReflectionFile;
 use PhpMx\Terminal;
-use PhpMx\Import;
 use PhpMx\Trait\TerminalHelperTrait;
 
 /** Lista as middlewares registradas no projeto */
@@ -13,44 +12,27 @@ return new class {
 
     function __invoke($fitler = null)
     {
-        $this->handle('system/middleware', $fitler);
+        $this->handle(
+            'system/middleware',
+            $fitler,
+            function ($item) {
+                Terminal::echol(' - [#c:p,#name] [#c:sd,#file][#c:sd,:][#c:sd,#line]', $item);
+                foreach ($item['description'] as $description)
+                    Terminal::echol("      $description");
+            }
+        );
     }
 
     protected function scan($path)
     {
-        $files = [];
+        $items = [];
+
         foreach (Dir::seekForFile($path, true) as $item) {
-
-            $ref = substr($item, 0, -4);
-            $ref = str_replace(['/', '\\'], '.', $ref);
-
-            $file = path($path, $item);
-            $content = Import::content($file);
-
-            preg_match('/(?:return|.*?=)\s*new\s+class/i', $content, $match, PREG_OFFSET_CAPTURE);
-            $description = $match ? $this->getDocBefore($content, $match[0][1]) : '';
-
-            $files[] = [
-                'ref' => $ref,
-                'description' => $description
-            ];
+            $scheme = ReflectionFile::middlewareFile(path($path, $item));
+            if (!empty($scheme))
+                $items[] = $scheme;
         }
-        return $files;
-    }
 
-    protected function getDocBefore(string $code, int $pos): string
-    {
-        $before = substr($code, 0, $pos);
-        if (preg_match_all('/\/\*\*\s*(.*?)\s*\*\//s', $before, $docs)) {
-            $lastDoc = end($docs[0]);
-            $lastDesc = end($docs[1]);
-            $lastPos = strrpos($before, $lastDoc) + strlen($lastDoc);
-
-            $between = substr($before, $lastPos);
-
-            if (preg_match('/^[\s\w\$\=]*$/', $between))
-                return trim($lastDesc);
-        }
-        return '';
+        return $items;
     }
 };

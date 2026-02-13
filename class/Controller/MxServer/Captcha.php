@@ -12,8 +12,7 @@ class Captcha
     /** Gera um desafio de captcha alfanumérico com imagem em base64 e chave criptografada */
     function __invoke($color = '000', $background = 'fff')
     {
-        if (!extension_loaded('gd'))
-            throw new Exception("Extension [gd] is required to use Captcha.", STS_INTERNAL_SERVER_ERROR);
+        phpex('gd');
 
         $fg = $color;
         $bg = $background;
@@ -40,12 +39,12 @@ class Captcha
 
     protected function getImage($captcha, $fg, $bg): string
     {
-        $fg = $this->getColorRGB($fg);
-        $bg = $this->getColorRGB($bg);
+        $fg = explode(',', colorRGB($fg));
+        $bg = explode(',', colorRGB($bg));
 
         $image = imagecreate(175, 50);
-        imagecolorallocate($image, $bg['r'], $bg['g'], $bg['b']);
-        $color = imagecolorallocate($image, $fg['r'], $fg['g'], $fg['b']);
+        imagecolorallocate($image, $bg[0], $bg[1], $bg[2]);
+        $color = imagecolorallocate($image, $fg[0], $fg[1], $fg[2]);
 
         $fontFile = Path::seekForFile('library/font/catcha.ttf');
 
