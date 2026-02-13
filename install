@@ -1,6 +1,5 @@
 <?php
 
-use PhpMx\Terminal;
 use PhpMx\Trait\TerminalInstallTrait;
 
 return new class {

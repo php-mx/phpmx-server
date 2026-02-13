@@ -5,6 +5,7 @@
 !/class/Controller/MxServer
 
 /system/router/*
+!/system/router/MxServer.php
 
 # MX-CORE
 
