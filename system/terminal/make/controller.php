@@ -3,15 +3,15 @@
 use PhpMx\File;
 use PhpMx\Import;
 use PhpMx\Path;
-use PhpMx\Router;
 use PhpMx\Terminal;
 
 /** Gera um novo arquivo de Controller com namespace e estrutura baseados no caminho informado */
 return new class {
 
-    function __invoke($controller)
+    function __invoke($controller, $method = null)
     {
         $controller = str_replace('.', '/', $controller);
+        $controller = str_replace('\\', '/', $controller);
         $controller = explode('/', $controller);
         $controller = array_map(fn($v) => ucfirst($v), $controller);
 
@@ -22,11 +22,13 @@ return new class {
 
         $class = array_pop($controller);
         $namespace = implode('\\', ['Controller', ...$controller]);
+        $method = $method ?? '__invoke()';
 
         $template = Path::seekForFile('library/template/terminal/controller.txt');
         $template = Import::content($template, [
             'class' => $class,
-            'namespace' => $namespace
+            'namespace' => $namespace,
+            'method' => $method,
         ]);
 
         File::create($file, $template);

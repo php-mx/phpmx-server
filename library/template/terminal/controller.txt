@@ -6,7 +6,7 @@ namespace [#namespace];
 class [#class]
 {
     /** */
-    function __invoke()
+    function [#method]()
     {
         return STS_NOT_IMPLEMENTED;
     }
