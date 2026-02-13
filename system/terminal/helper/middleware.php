@@ -1,7 +1,8 @@
 <?php
 
 use PhpMx\Dir;
-use PhpMx\ReflectionFile;
+use PhpMx\Import;
+use PhpMx\Path;
 use PhpMx\Terminal;
 use PhpMx\Trait\TerminalHelperTrait;
 
@@ -28,11 +29,41 @@ return new class {
         $items = [];
 
         foreach (Dir::seekForFile($path, true) as $item) {
-            $scheme = ReflectionFile::middlewareFile(path($path, $item));
+            $scheme = $this->getFileScheme(path($path, $item));
             if (!empty($scheme))
                 $items[] = $scheme;
         }
 
         return $items;
+    }
+
+    protected function getFileScheme(string $file): array
+    {
+        $content = Import::content($file);
+
+        preg_match('/(?:return|.*?=)\s*new\s+class/i', $content, $match, PREG_OFFSET_CAPTURE);
+
+        if (!$match) return [];
+
+        $pos = $match[0][1];
+
+        $docBlock = $this->docBlockBefore($content, $pos);
+        $docScheme = $this->parseDocBlock($docBlock, ['description']);
+
+        $docScheme['context'] = $docScheme['context'] ?? 'http';
+
+        $middleware = explode('system/middleware/', $file);
+        $middleware = array_pop($middleware);
+        $middleware = substr($middleware, 0, -4);
+        $middleware = str_replace(['/', '\\'], '.', $middleware);
+
+        return [
+            'key' => $middleware,
+            'name' => $middleware,
+            'origin' => Path::origin($file),
+            'file' => $file,
+            'line' => substr_count(substr($content, 0, $pos), "\n") + 1,
+            ...$docScheme,
+        ];
     }
 };

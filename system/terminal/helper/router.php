@@ -1,13 +1,16 @@
 <?php
 
-use PhpMx\DocScheme;
 use PhpMx\Dir;
+use PhpMx\Import;
 use PhpMx\Path;
-use PhpMx\ReflectionFile;
+use PhpMx\Router;
 use PhpMx\Terminal;
+use PhpMx\Trait\TerminalHelperTrait;
 
 /** Lista as rotas registradas no projeto */
 return new class {
+
+    use TerminalHelperTrait;
 
     function __invoke($match = null, $method = null)
     {
@@ -21,7 +24,7 @@ return new class {
             foreach (array_reverse(Dir::seekForFile($path, true)) as $file) {
                 $origim = Path::origin($path);
                 $registredRoutes[$origim] = $registredRoutes[$origim] ?? $defaultScheme;
-                foreach (ReflectionFile::routerFile(path($path, $file)) as $scheme) {
+                foreach ($this->getFileScheme(path($path, $file)) as $scheme) {
                     $routeTemplate = $scheme['path'];
                     $routeMethod = $scheme['method'];
 
@@ -89,7 +92,81 @@ return new class {
             Terminal::echol('[#c:dd,- empty -]');
     }
 
-    protected static function checkRouteMatch(array $path, string $template): bool
+
+    protected function getFileScheme(string $file): array
+    {
+        $schemes = [];
+
+        /** @var Router|mixed $interceptor */
+        $interceptor = new class extends Router {
+            function intercept(string $file): array
+            {
+                $ROUTE = self::$ROUTE;
+                $CURRENT_MIDDLEWARE = self::$CURRENT_MIDDLEWARE;
+                $CURRENT_PATH = self::$CURRENT_PATH;
+                $SCANNED = self::$SCANNED;
+                Import::only($file);
+                $intercepted = self::$ROUTE;
+                self::$ROUTE = $ROUTE;
+                self::$CURRENT_MIDDLEWARE = $CURRENT_MIDDLEWARE;
+                self::$CURRENT_PATH = $CURRENT_PATH;
+                self::$SCANNED = $SCANNED;
+                return $intercepted;
+            }
+        };
+
+        foreach ($interceptor->intercept($file) as $method => $routes)
+            foreach ($routes as $route)
+                $schemes[] = [
+                    'path' => $route[0],
+
+                    'middlewares' => $route[3] ?? [],
+                    'method' => $method,
+                    'response' => $this->extractRouteReponse($route[1]),
+
+                    'origin' => Path::origin($file),
+                    'file' => $file,
+                    'line' => null,
+                ];
+
+        return $schemes;
+    }
+
+    protected function extractRouteReponse($response): array
+    {
+        if (is_int($response))
+            return ['type' => 'status', 'code' => $response, 'description' => ''];
+
+        $parts = is_array($response) ? $response : [$response];
+        $controller = array_shift($parts);
+        $method = array_shift($parts) ?? '__invoke';
+
+        $info = [
+            'type' => 'class',
+            'class' => $controller,
+            'method' => $method,
+            'callable' => false,
+            'file' => null,
+            'line' => null,
+        ];
+
+        if (class_exists($controller)) {
+            if (method_exists($controller, $method)) {
+                $refMethod = new ReflectionMethod($controller, $method);
+                $info['file'] = path($refMethod->getFileName());
+                $info['line'] = $refMethod->getStartLine();
+                $info['callable'] = true;
+            } else {
+                $reflection = new ReflectionClass($controller);
+                $info['file'] = path($reflection->getFileName());
+                $info['line'] = $reflection->getStartLine();
+            }
+        }
+
+        return $info;
+    }
+
+    protected function checkRouteMatch(array $path, string $template): bool
     {
         $path = array_shift($path);
 
@@ -112,7 +189,7 @@ return new class {
         return count($path) === 0;
     }
 
-    protected static function organize(array $array): array
+    protected function organize(array $array): array
     {
         uasort($array, function ($itemA, $itemB) {
             $a = $itemA['order'];
