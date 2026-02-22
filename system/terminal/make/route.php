@@ -48,7 +48,7 @@ return new class {
         }
 
         if (is_blank($content))
-            $content = "<?php\n\nuse PhpMx\Router;\n";
+            $content = "<?php\n\nnamespace Controller;\n\nuse PhpMx\Router;\n";
 
         $content .= "\n$routeDefinition";
 
