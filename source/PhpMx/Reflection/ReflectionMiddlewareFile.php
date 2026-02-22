@@ -20,8 +20,6 @@ abstract class ReflectionMiddlewareFile extends BaseReflectionFile
         $docBlock = self::docBlockBefore($content, $pos);
         $docScheme = self::parseDocBlock($docBlock);
 
-        $docScheme['context'] = $docScheme['context'] ?? 'http';
-
         $middleware = explode('system/middleware/', $file);
         $middleware = array_pop($middleware);
         $middleware = substr($middleware, 0, -4);
