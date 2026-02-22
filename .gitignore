@@ -1,7 +1,5 @@
-/.conf
-/vendor
 /mx
-
+/.conf
 /composer.lock
 
 /source/Controller/*
