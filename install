@@ -1,5 +1,6 @@
 <?php
 
+use PhpMx\Terminal;
 use PhpMx\Trait\TerminalInstallTrait;
 
 return new class {
@@ -8,15 +9,11 @@ return new class {
 
     function __invoke()
     {
-        self::createDir('class/Controller');
-        self::createDir('library');
-        self::createDir('library/assets');
-        self::createDir('library/download');
+        self::createDir('source/Controller');
+        self::createDir('storage/assets');
+        self::createDir('storage/download');
         self::createDir('system/middleware');
         self::createDir('system/router');
-
-        self::promote('.htaccess');
-        self::promote('index.php');
 
         self::blockFile('.env', 'MX-SERVER', [
             'FORCE_SSL = false'

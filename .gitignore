@@ -1,8 +1,5 @@
-/.conf
-/composer.lock
-
-/class/Controller/*
-!/class/Controller/MxServer
+/source/Controller/*
+!/source/Controller/MxServer
 
 /system/router/*
 !/system/router/MxServer.php
@@ -12,5 +9,5 @@
 /.env
 /vendor
 /.vscode
-/library/cache
-/library/certificate
+/storage/cache
+/storage/certificate

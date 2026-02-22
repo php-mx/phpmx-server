@@ -11,15 +11,9 @@
     ],
     "autoload": {
         "psr-4": {
-            "": "class/"
+            "": "source/"
         },
         "files": [
-            "system/helper/constant/http_status.php",
-            "system/helper/function/dbug.php",
-            "system/helper/function/is.php",
-            "system/helper/function/redirect.php",
-            "system/helper/function/url.php",
-            "system/helper/script/env.php",
             "system/helper/script/path.php"
         ]
     },

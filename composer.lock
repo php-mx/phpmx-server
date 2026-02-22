@@ -1,0 +1,90 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
+        "This file is @generated automatically"
+    ],
+    "content-hash": "c5d9c5d279b96480712317e0c5e54582",
+    "packages": [
+        {
+            "name": "phpmx/core",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/php-mx/phpmx-core.git",
+                "reference": "aa2e4f2b8193ed11c0adfbc00f01e37a0d5da4db"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/php-mx/phpmx-core/zipball/aa2e4f2b8193ed11c0adfbc00f01e37a0d5da4db",
+                "reference": "aa2e4f2b8193ed11c0adfbc00f01e37a0d5da4db",
+                "shasum": ""
+            },
+            "require": {
+                "ext-fileinfo": "*",
+                "ext-mbstring": "*",
+                "php": "^8.1"
+            },
+            "default-branch": true,
+            "bin": [
+                "mx"
+            ],
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "system/helper/constant/char_normalizer.php",
+                    "system/helper/constant/request_is.php",
+                    "system/helper/function/cache.php",
+                    "system/helper/function/changes.php",
+                    "system/helper/function/dbug.php",
+                    "system/helper/function/env.php",
+                    "system/helper/function/is.php",
+                    "system/helper/function/mx5.php",
+                    "system/helper/function/num.php",
+                    "system/helper/function/path.php",
+                    "system/helper/function/phpex.php",
+                    "system/helper/function/prepare.php",
+                    "system/helper/function/remove_accents.php",
+                    "system/helper/function/str.php",
+                    "system/helper/function/str_to.php",
+                    "system/helper/function/uuid.php",
+                    "system/helper/script/env.php",
+                    "system/helper/script/error.php",
+                    "system/helper/script/log.php",
+                    "system/helper/script/path.php",
+                    "system/helper/script/timezone.php"
+                ],
+                "psr-4": {
+                    "": "source/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "André Ricardo",
+                    "email": "contatoadmx@gmail.com"
+                }
+            ],
+            "description": "Núcleo para aplicações modernas em PHP",
+            "support": {
+                "issues": "https://github.com/php-mx/phpmx-core/issues",
+                "source": "https://github.com/php-mx/phpmx-core/tree/main"
+            },
+            "time": "2026-02-21T23:54:28+00:00"
+        }
+    ],
+    "packages-dev": [],
+    "aliases": [],
+    "minimum-stability": "dev",
+    "stability-flags": {
+        "phpmx/core": 20
+    },
+    "prefer-stable": false,
+    "prefer-lowest": false,
+    "platform": {},
+    "platform-dev": {},
+    "plugin-api-version": "2.9.0"
+}
