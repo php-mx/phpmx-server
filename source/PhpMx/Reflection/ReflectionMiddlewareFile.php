@@ -34,7 +34,7 @@ abstract class ReflectionMiddlewareFile extends BaseReflectionFile
             'name' => $middleware,
 
             'origin' => Path::origin($file),
-            'file' => $file,
+            'file' => path($file),
             'line' => substr_count(substr($content, 0, $pos), "\n") + 1,
 
             ...$docScheme,

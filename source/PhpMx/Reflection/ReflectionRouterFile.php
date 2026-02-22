@@ -48,7 +48,7 @@ abstract class ReflectionRouterFile extends BaseReflectionFile
                     'middlewares' => $route[3] ?? [],
                     'response' => $responseInfo,
                     'origin' => Path::origin($file),
-                    'file' => $file,
+                    'file' => path($file),
                     'summary' => $responseInfo['summary'] ?? null,
                 ];
             }
