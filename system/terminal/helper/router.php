@@ -67,7 +67,7 @@ return new class {
                 foreach (array_reverse($routes) as $item) {
                     Terminal::echol();
                     if (!$item['replaced']) {
-                        Terminal::echol('   [#c:d,#method][#c:d,:][#c:p,#template] [#c:sd,#file]', $item);
+                        Terminal::echol('   [#c:d,#method][#c:d,:][#c:p,#template] [#c:sd,#_file]', $item);
                         $response = $item['response'];
 
                         if ($response['type'] == 'status')
@@ -75,17 +75,17 @@ return new class {
 
                         if ($response['type'] == 'class') {
                             if ($response['callable']) {
-                                Terminal::echol("      [#c:s,#class][#c:s,::][#c:s,#method][#c:s,()] [#c:sd,#file][#c:sd,:][#c:sd,#line]", $response);
+                                Terminal::echol("      [#c:s,#class][#c:s,::][#c:s,#method][#c:s,()] [#c:sd,#_file][#c:sd,:][#c:sd,#_line]", $response);
                                 foreach ($response['description'] as $description)
                                     Terminal::echol("         $description");
                             } elseif ($response['file']) {
-                                Terminal::echol("      [#c:dd,#class][#c:dd,::][#c:e,#method][#c:e,()] [#c:sd,#file]", $response);
+                                Terminal::echol("      [#c:dd,#class][#c:dd,::][#c:e,#method][#c:e,()] [#c:sd,#_file]", $response);
                             } else {
                                 Terminal::echol("      [#c:e,#class][#c:dd,::][#c:dd,#method][#c:dd,()]", $response);
                             }
                         }
                     } else {
-                        Terminal::echol(' - [#c:dd,#method][#c:sd,:][#c:pd,#template] [#c:sd,#file] [#c:wd,replaced]', $item);
+                        Terminal::echol(' - [#c:dd,#method][#c:sd,:][#c:pd,#template] [#c:sd,#_file] [#c:wd,replaced]', $item);
                     }
                 }
             }

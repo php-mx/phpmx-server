@@ -40,17 +40,17 @@ abstract class ReflectionRouterFile extends BaseReflectionFile
             foreach ($routes as $route) {
                 $responseInfo = self::extractRouteResponse($route[1]);
 
-                $schemes[] = [
-                    'key' => "route:" . strtolower($method) . ":" . $route[0],
-                    'typeKey' => 'route',
+                $schemes[] = array_filter([
+                    '_key' => md5("route:" . strtolower($method) . ":" . $route[0]),
+                    '_type' => 'route',
+                    '_file' => path($file),
+                    '_origin' => Path::origin($file),
+
                     'path' => $route[0],
                     'method' => strtoupper($method),
                     'middlewares' => $route[3] ?? [],
                     'response' => $responseInfo,
-                    'origin' => Path::origin($file),
-                    'file' => path($file),
-                    'summary' => $responseInfo['summary'] ?? null,
-                ];
+                ]);
             }
         }
 
@@ -68,28 +68,32 @@ abstract class ReflectionRouterFile extends BaseReflectionFile
         $method = array_shift($parts) ?? '__invoke';
 
         $info = [
+            '_key' => md5("class:$controller"),
+            '_type' => 'class',
+            '_file' => null,
+            '_line' => null,
+            '_origin' => null,
+
             'type' => 'class',
             'class' => $controller,
             'method' => $method,
             'callable' => false,
-            'file' => null,
-            'line' => null,
         ];
 
         if (class_exists($controller)) {
             $reflection = new ReflectionClass($controller);
-            $info['file'] = path($reflection->getFileName());
+            $info['_file'] = path($reflection->getFileName());
+            $info['_origin'] = Path::origin(path($reflection->getFileName()));
 
             if (method_exists($controller, $method)) {
                 $refMethod = new ReflectionMethod($controller, $method);
-                $info['line'] = $refMethod->getStartLine();
+                $info['_line'] = $refMethod->getStartLine();
                 $info['callable'] = true;
 
                 $doc = self::parseDocBlock($refMethod->getDocComment());
-                $info['summary'] = $doc['summary'] ?? null;
-                $info['description'] = $doc['description'] ?? [];
+                $info['description'] = $doc['description'] ?? null;
             } else {
-                $info['line'] = $reflection->getStartLine();
+                $info['_line'] = $reflection->getStartLine();
             }
         }
 

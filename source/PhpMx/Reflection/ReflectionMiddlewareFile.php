@@ -25,17 +25,15 @@ abstract class ReflectionMiddlewareFile extends BaseReflectionFile
         $middleware = substr($middleware, 0, -4);
         $middleware = str_replace(['/', '\\'], '.', $middleware);
 
-        return [
-            'key' => "middleware:$middleware",
-            'typeKey' => 'middleware',
+        return array_filter([
+            '_key' => md5("middleware:$middleware"),
+            '_type' => 'middleware',
+            '_file' => path($file),
+            '_line' => substr_count(substr($content, 0, $pos), "\n") + 1,
+            '_origin' => Path::origin($file),
 
             'name' => $middleware,
-
-            'origin' => Path::origin($file),
-            'file' => path($file),
-            'line' => substr_count(substr($content, 0, $pos), "\n") + 1,
-
             ...$docScheme,
-        ];
+        ]);
     }
 }

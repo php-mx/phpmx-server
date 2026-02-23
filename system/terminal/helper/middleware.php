@@ -19,7 +19,7 @@ return new class {
             'system/middleware',
             $fitler,
             function ($item) {
-                Terminal::echol('   [#c:p,#name] [#c:sd,#file][#c:sd,:][#c:sd,#line]', $item);
+                Terminal::echol('   [#c:p,#name] [#c:sd,#_file][#c:sd,:][#c:sd,#_line]', $item);
                 foreach ($item['description'] as $description)
                     Terminal::echol("      $description");
             }
