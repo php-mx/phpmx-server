@@ -1,5 +1,6 @@
 <?php
 
+use PhpMx\Json;
 use PhpMx\Terminal;
 use PhpMx\Trait\TerminalInstallTrait;
 
@@ -18,5 +19,10 @@ return new class {
         self::blockFile('.env', 'MX-SERVER', [
             'FORCE_SSL = false'
         ]);
+
+        $settings = Json::import('.vscode/settings.json');
+        $settings['explorer.fileNesting.patterns'] = $settings['explorer.fileNesting.patterns'] ?? [];
+        $settings['explorer.fileNesting.patterns']['index.php'] = ".htaccess";
+        Json::export('.vscode/settings.json', $settings);
     }
 };
