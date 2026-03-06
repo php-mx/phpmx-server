@@ -5,8 +5,17 @@ namespace PhpMx\Reflection;
 use PhpMx\Import;
 use PhpMx\Path;
 
+/**
+ * Extrai o esquema de reflexão de um arquivo de middleware do sistema.
+ * Lê o docblock da classe anônima retornada pelo arquivo e constrói o mapa de metadados do middleware.
+ */
 abstract class ReflectionMiddlewareFile extends BaseReflectionFile
 {
+    /**
+     * Retorna o esquema de metadados de um arquivo de middleware.
+     * @param string $file Caminho absoluto do arquivo de middleware.
+     * @return array Mapa com nome, tipo, arquivo, linha, origem e dados do docblock.
+     */
     static function scheme(string $file): array
     {
         $content = Import::content($file);

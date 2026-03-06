@@ -8,8 +8,18 @@ use PhpMx\Router;
 use ReflectionClass;
 use ReflectionMethod;
 
+/**
+ * Extrai o esquema de reflexão de um arquivo de rotas do sistema.
+ * Intercepta temporariamente o registro de rotas do Router para mapear cada rota declarada no arquivo
+ * e construir o mapa de metadados com método, path, middlewares e informações do controller.
+ */
 abstract class ReflectionRouterFile extends BaseReflectionFile
 {
+    /**
+     * Retorna o esquema de metadados de todas as rotas declaradas em um arquivo de rotas.
+     * @param string $file Caminho absoluto do arquivo de rotas.
+     * @return array Lista de mapas de rota com path, método, middlewares e resposta.
+     */
     static function scheme(string $file): array
     {
         $schemes = [];
@@ -57,6 +67,11 @@ abstract class ReflectionRouterFile extends BaseReflectionFile
         return array_filter($schemes);
     }
 
+    /**
+     * Extrai e estrutura as informações de resposta de uma rota (status HTTP, classe e método).
+     * @param int|string|array $response Valor da resposta registrado na rota.
+     * @return array Mapa com tipo, classe, método, arquivo, linha e se é callable.
+     */
     protected static function extractRouteResponse($response): array
     {
         if (is_int($response)) {
