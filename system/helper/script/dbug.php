@@ -1,6 +1,6 @@
 <?php
 
-if (!function_exists('dbugpre')) {
+if (!function_exists('dpre')) {
 
     /**
      * Realiza o var_dump de variáveis dentro de uma tag HTML pre.
