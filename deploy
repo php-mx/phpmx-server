@@ -1,0 +1,11 @@
+<?php
+
+use PhpMx\Dir;
+
+return new class {
+
+    function __invoke()
+    {
+        Dir::remove('storage/cache', true);
+    }
+};
